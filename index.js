@@ -5,7 +5,7 @@ const Logger = require('./src/logger/');
 const config = require('./config');
 
 const logger = new Logger('Core', []);
-const worker = new GatewayClient(config.gateway.use, 'interactions', config.gateway.address, config.gateway.secret, process.env.NODE_APP_ID || 0);
+const worker = new GatewayClient(config.gateway.use, 'interactions', config.gateway.address, config.gateway.secret, process.env.NODE_APP_INSTANCE || 0);
 
 worker
   .on('error', (err) => logger.extension('Gateway').error(err))
