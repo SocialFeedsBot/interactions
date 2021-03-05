@@ -24,14 +24,14 @@ module.exports = class extends Command {
         .setEmoji('xmark');
     }
 
-    let { success, docs } = await this.getFeeds(guildID);
+    let { success, docs: allDocs } = await this.getFeeds(guildID);
     if (!success) {
       return new Command.InteractionResponse()
         .setContent('I need permissions to **Manage Webhooks** in order to view your feed list.')
         .setEmoji('xmark');
     }
 
-    docs = docs.filter(doc => doc.channelID === channel.id);
+    let docs = allDocs.filter(doc => doc.channelID === channel.id);
     if (!docs.length) {
       return new Command.InteractionResponse()
         .setContent('There are no feeds setup in this channel.')
@@ -41,15 +41,16 @@ module.exports = class extends Command {
       let description = '';
 
       const embed = new Command.InteractionEmbedResponse()
-        .setTitle(`Viewing feed list for #${channel.name}`)
-        .setColour('orange');
+        .setTitle(`Feed list for #${channel.name}`)
+        .setColour(16753451)
+        .setFooter(`Total feeds: ${allDocs.length} (15 max shown)`);
 
       // Populate fields
       docs.forEach((doc) => {
         description += `\n${this.feedType(doc)} ${doc.type === 'twitter' ? `[${doc.options.replies ? 'with replies' : 'without replies'}]` : ''}`;
       });
 
-      embed.setDescription(`**:information_source: Only 20 feeds are shown. You can now manage your feeds on an online dashboard.** [Click here to go.](https://socialfeeds.app)\n\n${description}`);
+      embed.setDescription(`You can now manage your feeds on an online [dashboard](https://socialfeeds.app)\n${description}`);
 
       // Send the embed
       return embed;
