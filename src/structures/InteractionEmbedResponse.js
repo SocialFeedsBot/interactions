@@ -21,6 +21,16 @@ class InteractionEmbedResponse extends InteractionResponse {
   }
 
   /**
+   * Set the embed footer
+   * @param {string} footer
+   * @returns {InteractionEmbedResponse}
+   */
+  setFooter (text) {
+    this.embed.footer = { text };
+    return this;
+  }
+
+  /**
    * Set the author from a string or User
    * @param {User|string} author
    * @param {string} [iconURL]
