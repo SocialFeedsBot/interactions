@@ -10,5 +10,5 @@ const Colours = {
 
 module.exports = {
   Colours,
-  resolveColour: (colour) => Colours[colour] || parseInt(colour.replace('#', ''), 16)
+  resolveColour: (colour) => Number.isInteger(colour) ? colour : Colours[colour] || parseInt(colour.replace('#', ''), 16)
 };
