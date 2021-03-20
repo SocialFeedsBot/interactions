@@ -19,6 +19,7 @@ module.exports = class Interactions {
     this.config = config;
     this.id = id;
     this.app = app;
+    this.startedAt = Date.now();
 
     this.dispatch = new Dispatch(this, logger);
     this.rest = new RequestHandler(logger, { token: config.token });
