@@ -34,7 +34,7 @@ module.exports = class extends Command {
         .setEmoji('xmark');
     }
 
-    const webhook = (await this.core.rest.api.channels(channelID).webhooks.get())
+    const webhook = (await this.core.rest.api.channels(channel.id).webhooks.get())
       .filter(hook => hook.user.id === this.core.config.applicationID)[0];
     const { success, message } = await this.core.api.deleteFeed(guildID, {
       url,
