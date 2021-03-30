@@ -41,17 +41,6 @@ module.exports = class Interactions {
     this.app.use(morgan(':date[web] [Request/DEBUG] :method :url :status - :response-time ms'));
     this.registerRoutes();
 
-    // Gateway
-    this.gatewayClient.on('request', async (id, data) => {
-      try {
-        let res = await eval(data.input);
-        this.gatewayClient.resolve(id, res);
-      } catch(err) {
-        this.gatewayClient.resolve(id, err.stack);
-      }
-      return undefined;
-    });
-
     this.logger.ok(`Server listening on port: ${config.port}`);
     this.gatewayClient.sendReady();
   }

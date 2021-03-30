@@ -36,9 +36,8 @@ module.exports = class extends Command {
     const { body: { feedCount: statusFeeds } } = await this.core.api.getAllFeeds({ type: 'statuspage' });
 
     if (this.core.gatewayClient.connected) {
-      let mem = await this.core.gatewayClient.request({ name: 'interactions', id: 'all' }, 'process.memoryUsage().heapUsed');
-
-      ram = mem.reduce((a, b) => a + b);
+      let mem = await this.core.gatewayClient.action('stats', { name: 'interactions' });
+      ram = mem.reduce((acc, val) => acc + val.memory, 0);
     }
 
     return new Command.InteractionEmbedResponse()
