@@ -28,12 +28,7 @@ module.exports = class extends Command {
         .setEphemeral();
     }
 
-    const { body: { feedCount: twitterFeeds } } = await this.core.api.getAllFeeds({ type: 'twitter' });
-    const { body: { feedCount: twitchFeeds } } = await this.core.api.getAllFeeds({ type: 'twitch' });
-    const { body: { feedCount: youtubeFeeds } } = await this.core.api.getAllFeeds({ type: 'youtube' });
-    const { body: { feedCount: redditFeeds } } = await this.core.api.getAllFeeds({ type: 'reddit' });
-    const { body: { feedCount: rssFeeds } } = await this.core.api.getAllFeeds({ type: 'rss' });
-    const { body: { feedCount: statusFeeds } } = await this.core.api.getAllFeeds({ type: 'statuspage' });
+    const { body: counts } = await this.core.api.getCounts();
 
     if (this.core.gatewayClient.connected) {
       let mem = await this.core.gatewayClient.action('stats', { name: 'interactions' });
@@ -46,12 +41,12 @@ module.exports = class extends Command {
       .setThumbnail(Endpoints.avatarURL(this.core.user.id, this.core.user.avatar))
       .addField('Feeds', stripIndents`:white_small_square: Total feeds: **${feeds.feedCount.toLocaleString()}**
         :white_small_square: Feeds this server: **${thisServer.feedCount.toLocaleString()}**
-        :white_small_square: Twitter: **${twitterFeeds.toLocaleString()}**
-        :white_small_square: Twitch: **${twitchFeeds.toLocaleString()}**`, true)
-      .addField('\u200b', stripIndents`:white_small_square: YouTube: **${youtubeFeeds.toLocaleString()}**
-        :white_small_square: Reddit: **${redditFeeds.toLocaleString()}**
-        :white_small_square: RSS: **${rssFeeds.toLocaleString()}**
-        :white_small_square: Status pages: **${statusFeeds.toLocaleString()}**`, true)
+        :white_small_square: Twitter: **${counts.twitter.toLocaleString()}**
+        :white_small_square: Twitch: **${counts.twitch.toLocaleString()}**`, true)
+      .addField('\u200b', stripIndents`:white_small_square: YouTube: **${counts.youtube.toLocaleString()}**
+        :white_small_square: Reddit: **${counts.reddit.toLocaleString()}**
+        :white_small_square: RSS: **${counts.rss.toLocaleString()}**
+        :white_small_square: Status pages: **${counts.statuspage.toLocaleString()}**`, true)
       .addField('\u200b', '\u200b', true)
       .addField('Uptime', moment.duration(process.uptime() * 1000).format('D[ days], H[ hours], m[ minutes], s[ seconds]'), true)
       .addField('Memory Usage', this.convertMem(ram), true)
