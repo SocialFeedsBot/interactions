@@ -17,6 +17,10 @@ module.exports = class API {
     return this.api.feeds.get(undefined, query);
   }
 
+  getCounts (query = {}) {
+    return this.api.feeds.counts.get(undefined, query);
+  }
+
   getGuildFeeds (guildID, query = {}) {
     return this.api.feeds(guildID).get({}, query);
   }
