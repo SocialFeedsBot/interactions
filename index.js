@@ -1,5 +1,5 @@
 // INDEX: Connect to the gateway and start up the service.
-const GatewayClient = require('gateway-client');
+const GatewayClient = require('./src/gateway/');
 const Interactions = require('./src/Interactions');
 const Logger = require('./src/logger/');
 const config = require('./config');
