@@ -39,7 +39,7 @@ module.exports = class extends Command {
 
     const webhook = (await this.core.rest.api.channels(channel.id).webhooks.get())
       .filter(hook => hook.user.id === this.core.config.applicationID)[0];
-    const { success, message } = await this.core.api.deleteFeed(guildID, {
+    const { success, message, body } = await this.core.api.deleteFeed(guildID, {
       url: account,
       type: 'youtube',
       webhookID: webhook.id,
@@ -53,9 +53,30 @@ module.exports = class extends Command {
         .setColour('red');
     }
 
-    return new Command.InteractionResponse()
-      .setContent('This feed has been removed successfully.')
-      .setEmoji('check');
+    if (body.display) {
+      return new Command.InteractionEmbedResponse()
+        .setColour('green')
+        .setAuthor(body.display.title, body.display.icon)
+        .setDescription(`Successfully removed feed from \`#${channel.name}\`!`)
+        .setEmoji('check');
+    } else {
+      return new Command.InteractionEmbedResponse()
+        .setColour('green')
+        .setAuthor(`${this.humanise(body.type)}: ${body.url}`)
+        .setContent(`Successfully removed feed from \`#${channel.name}\`!`)
+        .setEmoji('check');
+    }
+  }
+
+  humanise(key) {
+    return {
+      reddit: 'Reddit',
+      rss: 'RSS',
+      twitter: 'Twitter',
+      twitch: 'Twitch',
+      youtube: 'YouTube',
+      statuspage: 'Status Page'
+    }[key];
   }
 
 };

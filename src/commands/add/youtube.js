@@ -42,7 +42,7 @@ module.exports = class extends Command {
 
     account = verifyFeed('youtube', account);
 
-    const { success, message } = await this.core.api.createNewFeed(guildID, {
+    const { success, message, body } = await this.core.api.createNewFeed(guildID, {
       url: account,
       type: 'youtube',
       channelID: channel.id,
@@ -57,8 +57,10 @@ module.exports = class extends Command {
         .setColour('red');
     }
 
-    return new Command.InteractionResponse()
-      .setContent(`New videos from that channel will be posted to <#${channel.id}>.`)
+    return new Command.InteractionEmbedResponse()
+      .setColour('green')
+      .setAuthor(body.feedData.title, body.feedData.icon)
+      .setDescription(`Successfully added feed in \`#${channel.name}\`!`)
       .setEmoji('check');
   }
 
