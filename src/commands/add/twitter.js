@@ -34,7 +34,7 @@ module.exports = class extends Command {
   }
 
   async run ({ member, guildID, args: [account, channel, replies, msg] }) {
-    if (channel.type !== 0) {
+    if (![0, 5].includes(channel.type)) {
       return new Command.InteractionResponse()
         .setContent('Channel can only be a text channel.')
         .setEmoji('xmark');

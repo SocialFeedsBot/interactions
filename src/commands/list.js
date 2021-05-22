@@ -1,4 +1,3 @@
-
 const Command = require('../framework/Command');
 const { ApplicationCommandOptionType } = require('../constants/Types');
 
@@ -18,7 +17,7 @@ module.exports = class extends Command {
   }
 
   async run ({ guildID, args: [channel] }) {
-    if (channel.type !== 0) {
+    if (![0, 5].includes(channel.type)) {
       return new Command.InteractionResponse()
         .setContent('Channel can only be a text channel.')
         .setEmoji('xmark');
