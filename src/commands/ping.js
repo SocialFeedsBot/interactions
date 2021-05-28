@@ -7,12 +7,13 @@ module.exports = class extends Command {
       name: 'ping',
       description: 'Reply with a pong to see if I am working!'
     });
+
+    this.awaitingClicks = new Map();
   }
 
   run () {
     return new Command.InteractionResponse()
-      .setContent('Pong!')
-      .setEmoji('check');
+      .setContent('Pong!');
   }
 
 };

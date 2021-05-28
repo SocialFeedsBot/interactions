@@ -10,6 +10,8 @@ module.exports = class Dispatch {
     this.logger = logger.extension('Dispatch');
     this.core = core;
     this.commandStore = new CommandStore(core);
+
+    this.awaiting = new Map();
   }
 
   async handleInteraction (data) {
@@ -24,6 +26,10 @@ module.exports = class Dispatch {
         return this.handleCommand(interaction)
           .catch(this.handleError.bind(this));
 
+      case InteractionType.MessageComponent:
+        return this.handleComponent(interaction)
+          .catch(this.handleError.bind(this));
+
       default:
         this.logger.warn(`Unknown interaction type "${interaction.type}" received`);
         return {};
@@ -34,7 +40,11 @@ module.exports = class Dispatch {
     const applicationCommand = new ApplicationCommand(interaction.data);
     const context = {
       ...interaction,
-      args: applicationCommand.args
+      args: applicationCommand.args,
+      awaitButton: (id) => new Promise((resolve) => this.awaiting.set(id, (arg) => {
+        this.awaiting.delete(id);
+        return resolve(arg);
+      }))
     };
 
     //  Check for a global command
@@ -49,6 +59,12 @@ module.exports = class Dispatch {
     return true;
   }
 
+  async handleComponent (interaction) {
+    // Find the command
+    const [command, button, id] = interaction.data.custom_id.split('.');
+    return await this.commandStore.get(command).onButtonClick(button, id, interaction);
+  }
+
   /**
    * Handle errors executing commands
    * @param error
@@ -57,8 +73,7 @@ module.exports = class Dispatch {
   handleError (error) {
     this.logger.error(error.stack);
     return new InteractionResponse()
-      .channelMessage()
-      .setContent('An unexpected error occurred executing this command.')
+      .setContent('An unexpected error occurred executing this interaction.')
       .setEmoji('xmark')
       .setEphemeral();
   }

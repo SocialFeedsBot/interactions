@@ -1,5 +1,6 @@
 const Command = require('../framework/Command');
-const { ApplicationCommandOptionType } = require('../constants/Types');
+const { ApplicationCommandOptionType, ComponentButtonStyle } = require('../constants/Types');
+const Button = require('../structures/ButtonComponent');
 
 module.exports = class extends Command {
 
@@ -16,7 +17,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run ({ guildID, args: [channel] }) {
+  async run ({ guildID, args: [channel], user, member, token }) {
     if (![0, 5].includes(channel.type)) {
       return new Command.InteractionResponse()
         .setContent('Channel can only be a text channel.')
@@ -36,20 +37,60 @@ module.exports = class extends Command {
         .setContent('There are no feeds setup in this channel.')
         .setEmoji('xmark');
     } else {
-      docs = docs.splice(0, 20);
-      let description = '';
+      let chunks = [];
+      while (docs.length > 0) chunks.push(docs.splice(0, 5));
 
-      const embed = new Command.InteractionEmbedResponse()
-        .setTitle(`Feed list for #${channel.name}`)
-        .setColour(16753451)
-        .setFooter(`Total feeds: ${allDocs.length} (15 max shown)`);
+      let page = Math.min(1, chunks.length) || 1;
+      let embed = this.generatePage(page, channel, allDocs, chunks)
+        .actionRow(
+          new Button({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}` }),
+          new Button({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}` })
+        );
 
-      // Populate fields
-      docs.forEach((doc) => {
-        description += `\n${this.feedType(doc)} ${doc.type === 'twitter' ? `[${doc.options.replies ? 'with replies' : 'without replies'}]` : ''}`;
+      this.awaitingButtons.set(`pagination:prevpage.${guildID}:${channel.id}`, {
+        userID: member ? member.user.id : user.id,
+        deleteAfter: false,
+        func: () => {
+          page = Math.min(page - 1, chunks.length) || 1;
+          embed = this.generatePage(page, channel, allDocs, chunks);
+          embed.updateMessage();
+
+          embed.actionRow(
+            new Button({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}` }),
+            new Button({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: (page - 1) === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}` })
+          );
+
+          return embed;
+        }
       });
 
-      embed.setDescription(`You can now manage your feeds on an online [dashboard](https://socialfeeds.app)\n${description}`);
+      this.awaitingButtons.set(`pagination:nextpage.${guildID}:${channel.id}`, {
+        userID: member ? member.user.id : user.id,
+        deleteAfter: false,
+        func: () => {
+          page = Math.min(page + 1, chunks.length);
+          embed = this.generatePage(page, channel, allDocs, chunks);
+          embed.updateMessage();
+
+          embed.actionRow(
+            new Button({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}` }),
+            new Button({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}` })
+          );
+
+          return embed;
+        }
+      });
+
+      setTimeout(() => {
+        this.awaitingButtons.delete(`pagination:nextpage.${guildID}:${channel.id}`);
+        this.awaitingButtons.delete(`pagination:prevpage.${guildID}:${channel.id}`);
+
+        this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch({
+          content: 'List timeout',
+          embeds: [],
+          components: []
+        });
+      }, 2 * 60 * 1000);
 
       // Send the embed
       return embed;
@@ -78,6 +119,22 @@ module.exports = class extends Command {
       page++;
       if (body.page >= body.pages) return { success, message, docs };
     }
+  }
+
+  generatePage (page, channel, allDocs, chunks) {
+    let description = '';
+    const embed = new Command.InteractionEmbedResponse()
+      .setTitle(`Feed list for #${channel.name}`)
+      .setColour(16753451)
+      .setFooter(`Total feeds: ${allDocs.length} (Page ${page}/${chunks.length})`);
+
+    // Populate fields
+    chunks[page - 1].forEach((doc) => {
+      description += `\n${this.feedType(doc)} ${doc.type === 'twitter' ? `[${doc.options.replies ? 'with replies' : 'without replies'}]` : ''}`;
+    });
+
+    embed.setDescription(`You can now manage your feeds on an online [dashboard](https://socialfeeds.app)\n${description}`);
+    return embed;
   }
 
 };

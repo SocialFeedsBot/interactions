@@ -2,15 +2,29 @@ module.exports = {
 
   InteractionType: {
     Ping: 1,
-    ApplicationCommand: 2
+    ApplicationCommand: 2,
+    MessageComponent: 3
+  },
+
+  ComponentType: {
+    ActionRow: 1,
+    Button: 2
+  },
+
+  ComponentButtonStyle: {
+    Blurple: 1,
+    Grey: 2,
+    Green: 3,
+    Red: 4,
+    Link: 5
   },
 
   InteractionResponseType: {
     Pong: 1,
-    Acknowledge: 2,
-    ChannelMessage: 3,
     ChannelMessageWithSource: 4,
-    AcknowledgeWithSource: 5
+    AcknowledgeWithSource: 5,
+    DeferredUpdateMessage: 6, // COMPONENTS
+    UpdateMessage: 7 // COMPONENTS
   },
 
   MessageFlags: {

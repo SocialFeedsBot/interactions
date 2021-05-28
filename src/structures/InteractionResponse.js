@@ -1,5 +1,6 @@
 const { InteractionResponseType, MessageFlags } = require('../constants/Types');
 const { resolveEmoji } = require('../constants/Emojis');
+const ActionRowComponent = require('./ActionRowComponent');
 
 class InteractionResponse {
 
@@ -7,14 +8,15 @@ class InteractionResponse {
     this.type = InteractionResponseType.ChannelMessageWithSource;
     this.flags = 0;
     this.content = null;
+    this.components = [];
   }
 
   /**
-   * Set the type to ChannelMessage
+   * Set the type to update a message [COMPONENTS ONLY]
    * @returns {InteractionResponse}
    */
-  channelMessage () {
-    this.type = InteractionResponseType.ChannelMessage;
+  updateMessage () {
+    this.type = InteractionResponseType.UpdateMessage;
     return this;
   }
 
@@ -48,10 +50,23 @@ class InteractionResponse {
     return this;
   }
 
+  /**
+   * Create an action row for components.
+   * @param {*} components
+   * @returns {InteractionResponse}
+   */
+  actionRow (...components) {
+    const row = new ActionRowComponent(components);
+    this.components.push(row);
+    return this;
+  }
+
   toJSON () {
     const result = {
       type: this.type,
-      data: {}
+      data: {
+        components: this.components
+      }
     };
     if (this.flags) result.data.flags = this.flags;
     if (this.content) result.data.content = this.content;

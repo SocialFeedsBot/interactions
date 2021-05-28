@@ -22,7 +22,6 @@ module.exports = class extends Command {
 
     if (!success) {
       return new Command.InteractionResponse()
-        .channelMessage()
         .setContent('An unexpected error occurred gathering statistics, please try again later.')
         .setEmoji('xmark')
         .setEphemeral();
