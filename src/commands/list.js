@@ -86,8 +86,6 @@ module.exports = class extends Command {
         this.awaitingButtons.delete(`pagination:prevpage.${guildID}:${channel.id}`);
 
         this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch({
-          content: 'List timeout',
-          embeds: [],
           components: []
         });
       }, 2 * 60 * 1000);
