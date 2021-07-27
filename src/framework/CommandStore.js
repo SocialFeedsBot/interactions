@@ -18,7 +18,9 @@ module.exports = class CommandStore extends Map {
     const readDirectory = (dir) => {
       const inPath = fs.readdirSync(dir);
       inPath.forEach(cmd => {
-        if (!cmd.endsWith('.js')) {
+        if (cmd.endsWith('.ignore')) {
+          // ignore
+        } else if (!cmd.endsWith('.js')) {
           readDirectory(`${dir}/${cmd}`);
         } else {
           this.registerCommand(`${dir}/${cmd}`);
@@ -76,6 +78,7 @@ module.exports = class CommandStore extends Map {
   async updateCommandList() {
     return this.core.rest.api
       .applications(config.applicationID)
+      .guilds('510841635618291712')
       .commands()
       .put(this.commandList());
   }

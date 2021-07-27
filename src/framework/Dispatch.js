@@ -40,11 +40,8 @@ module.exports = class Dispatch {
     const applicationCommand = new ApplicationCommand(interaction.data);
     const context = {
       ...interaction,
-      args: applicationCommand.args,
-      awaitButton: (id) => new Promise((resolve) => this.awaiting.set(id, (arg) => {
-        this.awaiting.delete(id);
-        return resolve(arg);
-      }))
+      user: interaction.member ? interaction.member.user : interaction.user,
+      args: applicationCommand.args
     };
 
     //  Check for a global command
@@ -60,9 +57,16 @@ module.exports = class Dispatch {
   }
 
   async handleComponent (interaction) {
-    // Find the command
-    const [command, button, id] = interaction.data.custom_id.split('.');
-    return await this.commandStore.get(command).onButtonClick(button, id, interaction);
+    // find in redis
+    let data = await this.core.redis.get(`interactions:awaits:${interaction.data.custom_id}`);
+    if (!data) {
+      return new InteractionResponse()
+        .setContent('Interaction timed out')
+        .setEmoji('xmark')
+        .setEphemeral();
+    }
+    data = JSON.parse(data);
+    return this.commandStore.get(data.command).handleComponent(data, interaction);
   }
 
   /**

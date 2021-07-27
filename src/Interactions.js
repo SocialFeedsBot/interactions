@@ -6,6 +6,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const nacl = require('tweetnacl');
 const bodyParser = require('body-parser');
+const Redis = require('ioredis');
 
 const Dispatch = require('./framework/Dispatch');
 const RequestHandler = require('./rest/RequestHandler');
@@ -20,6 +21,8 @@ module.exports = class Interactions {
     this.id = id;
     this.app = app;
     this.startedAt = Date.now();
+
+    this.redis = new Redis(config.redis);
 
     this.dispatch = new Dispatch(this, logger);
     this.rest = new RequestHandler(logger, { token: config.token });

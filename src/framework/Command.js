@@ -6,8 +6,10 @@ class Command {
     this.type = options.type;
     this.description = options.description;
     this.options = options.options || [];
+    this.choices = options.choices || [];
 
     this.awaitingButtons = new Map();
+    this.awaitingSelects = new Map();
   }
 
   get core () {
@@ -28,12 +30,27 @@ class Command {
     }
   }
 
+  onSelect (name, id, interaction) {
+    const user = interaction.member ? interaction.member.user : interaction.user;
+
+    if (this.awaitingSelects.get(`${name}.${id}`)) {
+      const data = this.awaitingSelects.get(`${name}.${id}`);
+      if (data.userID !== user.id) return null;
+
+      if (data.deleteAfter) this.awaitingSelects.delete(`${name}.${id}`);
+      return data.func(interaction);
+    } else {
+      return null;
+    }
+  }
+
   toJSON() {
     return {
       name: this.name,
       type: this.type,
       description: this.description,
-      options: this.options
+      options: this.options,
+      choices: this.choices
     };
   }
 
