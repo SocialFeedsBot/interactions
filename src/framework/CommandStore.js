@@ -78,7 +78,6 @@ module.exports = class CommandStore extends Map {
   async updateCommandList() {
     return this.core.rest.api
       .applications(config.applicationID)
-      .guilds('510841635618291712')
       .commands()
       .put(this.commandList());
   }
