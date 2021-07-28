@@ -47,6 +47,16 @@ module.exports = class Dispatch {
     //  Check for a global command
     const command = this.commandStore.get(applicationCommand.commandName);
     if (command) {
+      // check disabled
+      const disabled = await this.core.redis.get(`commands:${applicationCommand.commandName}:disabled`);
+      if (disabled && disabled !== 'no') {
+        return new InteractionEmbedResponse()
+          .setContent('This command is disabled')
+          .setDescription(`**Reason:** ${disabled}`)
+          .setColour('red');
+      }
+
+      // run
       return (await command.run(context)) ||
         new InteractionEmbedResponse()
           .setDescription('Missing response')
