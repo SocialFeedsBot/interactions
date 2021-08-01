@@ -54,7 +54,7 @@ module.exports = class extends Command {
         id: `deleteselect-${user.id}`,
         placeholder: `Click to see feeds (page ${i + 1})`,
         options: chunk,
-        maxValues: feeds.length
+        maxValues: chunk.length
       }));
     });
 
