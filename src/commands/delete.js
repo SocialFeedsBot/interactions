@@ -43,6 +43,8 @@ module.exports = class extends Command {
     }));
 
     feeds = feeds.map(f => this.display(f));
+    let chunks = [];
+    while (feeds.length > 0) chunks.push(feeds.splice(0, 25));
 
     return this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(
       new Command.InteractionResponse()
@@ -91,9 +93,9 @@ module.exports = class extends Command {
       statuspage: { name: 'statuspage', id: '809109311271600138' }
     };
     return {
-      label: feed.display && feed.display.title ? feed.display.title : feed.url.substring(0, 25),
-      value: feed.url,
-      description: feed.url,
+      label: feed.display && feed.display.title ? feed.display.title.substring(0, 25) : feed.url.substring(0, 25),
+      value: feed.url.length > 100 ? feed.url.substring(0, 99) : feed.url,
+      description: feed.url.length > 50 ? `${feed.url.substring(0, 45)}...` : feed.url,
       emoji: emojis[feed.type]
     };
   }
