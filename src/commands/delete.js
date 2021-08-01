@@ -1,5 +1,6 @@
-const { ApplicationCommandOptionType } = require('../constants/Types');
+const { ApplicationCommandOptionType, ComponentButtonStyle, ComponentType } = require('../constants/Types');
 const Command = require('../framework/Command');
+const Button = require('../structures/ButtonComponent');
 const Select = require('../structures/SelectComponent');
 
 module.exports = class extends Command {
@@ -39,7 +40,9 @@ module.exports = class extends Command {
     await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}`, JSON.stringify({
       command: 'delete',
       feeds,
-      token
+      token,
+      removeOnResponse: true,
+      userID: user.id
     }));
 
     feeds = feeds.map(f => this.display(f));
@@ -51,17 +54,33 @@ module.exports = class extends Command {
 
     chunks.forEach((chunk, i) => {
       resp.actionRow(new Select({
-        id: `deleteselect-${user.id}`,
+        id: `deleteselect-${user.id}-${i}`,
         placeholder: `Click to see feeds (page ${i + 1})`,
         options: chunk,
         maxValues: chunk.length
       }));
     });
 
+    resp.actionRow(new Button({
+      style: ComponentButtonStyle.Red,
+      label: 'Cancel',
+      id: `cancel-deleteselect-${user.id}`
+    }));
+
     return await this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(resp.toJSON().data);
   }
 
   async handleComponent (data, interaction) {
+    if (interaction.member.id !== data.userID) {
+      return null;
+    }
+
+    if (interaction.data.component_type === ComponentType.Button) {
+      return new Command.InteractionResponse()
+        .updateMessage()
+        .setContent('Select menu cancelled');
+    }
+
     const toRemove = interaction.data.values;
 
     let promises = [];
