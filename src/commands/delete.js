@@ -46,15 +46,19 @@ module.exports = class extends Command {
     let chunks = [];
     while (feeds.length > 0) chunks.push(feeds.splice(0, 25));
 
-    return this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(
-      new Command.InteractionResponse()
-        .setContent('Select the feeds you want to remove')
-        .actionRow(new Select({
-          id: `deleteselect-${user.id}`,
-          placeholder: 'Click to see feeds',
-          options: feeds,
-          maxValues: feeds.length
-        })).toJSON().data);
+    const resp = new Command.InteractionResponse()
+      .setContent('Select the feeds you want to remove');
+
+    chunks.forEach((chunk, i) => {
+      resp.actionRow(new Select({
+        id: `deleteselect-${user.id}`,
+        placeholder: `Click to see feeds (page ${i + 1})`,
+        options: feeds,
+        maxValues: feeds.length
+      }));
+    });
+
+    return await this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(resp.toJSON().data);
   }
 
   async handleComponent (data, interaction) {
