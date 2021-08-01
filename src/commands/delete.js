@@ -53,7 +53,7 @@ module.exports = class extends Command {
       resp.actionRow(new Select({
         id: `deleteselect-${user.id}`,
         placeholder: `Click to see feeds (page ${i + 1})`,
-        options: feeds,
+        options: chunk,
         maxValues: feeds.length
       }));
     });
