@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const Redis = require('ioredis');
 
 const Dispatch = require('./framework/Dispatch');
+const Prometheus = require('./framework/Prometheus');
 const RequestHandler = require('./rest/RequestHandler');
 const APIHandler = require('./api/API');
 
@@ -25,6 +26,7 @@ module.exports = class Interactions {
     this.redis = new Redis(config.redis);
 
     this.dispatch = new Dispatch(this, logger);
+    this.prometheus = new Prometheus(config.prometheus);
     this.rest = new RequestHandler(logger, { token: config.token });
     this.api = new APIHandler();
 

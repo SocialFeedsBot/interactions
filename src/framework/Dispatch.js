@@ -56,6 +56,9 @@ module.exports = class Dispatch {
           .setColour('red');
       }
 
+      // metrics
+      await this.core.prometheus.gauge('inc', 'commandsRan', 1);
+
       // run
       return (await command.run(context)) ||
         new InteractionEmbedResponse()
