@@ -17,7 +17,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run ({ token, guildID, member, user, args: [channel] }) {
+  async run ({ id, token, guildID, member, user, args: [channel] }) {
     if (![0, 5].includes(channel.type)) {
       return new Command.InteractionResponse()
         .setContent('Channel can only be a text channel.')
@@ -31,6 +31,8 @@ module.exports = class extends Command {
         .setEphemeral();
     }
 
+    await this.core.rest.api.interactions(id, token).callback.post(new Command.InteractionResponse()
+      .ack());
     let { body: { feeds } } = await this.core.api.getGuildFeeds(guildID);
     feeds = feeds.filter(f => f.channelID === channel.id);
 
@@ -42,14 +44,15 @@ module.exports = class extends Command {
 
     feeds = feeds.map(f => this.display(f));
 
-    return new Command.InteractionResponse()
-      .setContent('Select the feeds you want to remove')
-      .actionRow(new Select({
-        id: `deleteselect-${user.id}`,
-        placeholder: 'Click to see feeds',
-        options: feeds,
-        maxValues: feeds.length
-      }));
+    return this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(
+      new Command.InteractionResponse()
+        .setContent('Select the feeds you want to remove')
+        .actionRow(new Select({
+          id: `deleteselect-${user.id}`,
+          placeholder: 'Click to see feeds',
+          options: feeds,
+          maxValues: feeds.length
+        })).toJSON().data);
   }
 
   async handleComponent (data, interaction) {
