@@ -44,6 +44,14 @@ module.exports = class extends Command {
       removeOnResponse: true,
       userID: user.id
     }));
+    await this.core.redis.set(`interactions:awaits:cancel-deleteselect-${user.id}`, JSON.stringify({
+      command: 'delete',
+      feeds,
+      token,
+      removeOnResponse: true,
+      userID: user.id
+    }));
+
 
     feeds = feeds.map(f => this.display(f));
     let chunks = [];
