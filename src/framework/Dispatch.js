@@ -80,7 +80,7 @@ module.exports = class Dispatch {
     }
     data = JSON.parse(data);
     if (data.removeOnResponse) {
-      await this.core.redis.delete(`interactions:awaits:${interaction.data.custom_id}`);
+      await this.core.redis.del(`interactions:awaits:${interaction.data.custom_id}`);
     }
     return this.commandStore.get(data.command).handleComponent(data, interaction);
   }
