@@ -36,7 +36,6 @@ module.exports = class extends Command {
       .ack());
     let { body: { feeds } } = await this.core.api.getGuildFeeds(guildID);
     feeds = feeds.filter(f => f.channelID === channel.id);
-    feeds = feeds.map(f => this.display(f));
 
     await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}`, JSON.stringify({
       command: 'delete',
@@ -53,6 +52,7 @@ module.exports = class extends Command {
       userID: user.id
     }));
 
+    feeds = feeds.map(f => this.display(f));
     let chunks = [];
     while (feeds.length > 0) chunks.push(feeds.splice(0, 25));
 
