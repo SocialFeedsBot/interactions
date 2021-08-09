@@ -37,24 +37,24 @@ module.exports = class extends Command {
     let { body: { feeds } } = await this.core.api.getGuildFeeds(guildID);
     feeds = feeds.filter(f => f.channelID === channel.id);
     feeds = feeds.map(f => this.display(f));
-    let chunks = [];
-    while (feeds.length > 0) chunks.push(feeds.splice(0, 25));
 
     await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}`, JSON.stringify({
       command: 'delete',
-      feeds: chunks.flat(),
+      feeds,
       token,
       removeOnResponse: true,
       userID: user.id
     }));
     await this.core.redis.set(`interactions:awaits:cancel-deleteselect-${user.id}`, JSON.stringify({
       command: 'delete',
-      feeds: chunks.flat(),
+      feeds,
       token,
       removeOnResponse: true,
       userID: user.id
     }));
 
+    let chunks = [];
+    while (feeds.length > 0) chunks.push(feeds.splice(0, 25));
 
     const resp = new Command.InteractionResponse()
       .setContent('Select the feeds you want to remove');
