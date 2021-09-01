@@ -2,6 +2,7 @@ class Command {
 
   constructor (core, options = {}) {
     this._core = core;
+    this.isDeveloper = options.isDeveloper || false;
     this.name = options.name;
     this.type = options.type;
     this.description = options.description;
@@ -50,7 +51,8 @@ class Command {
       type: this.type,
       description: this.description,
       options: this.options,
-      choices: this.choices
+      choices: this.choices,
+      isDeveloper: this.isDeveloper
     };
   }
 
