@@ -37,6 +37,7 @@ module.exports = class extends Command {
     return new Command.InteractionEmbedResponse()
       .setColour('orange')
       .setTitle('Statistics')
+      .setFooter(`interactions-${this.core.id}`)
       .setThumbnail(Endpoints.avatarURL(this.core.user.id, this.core.user.avatar))
       .addField('Feeds', stripIndents`:white_small_square: Total feeds: **${feeds.feedCount.toLocaleString()}**
         :white_small_square: Feeds this server: **${thisServer.feedCount.toLocaleString()}**
