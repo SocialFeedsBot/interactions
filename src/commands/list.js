@@ -73,8 +73,8 @@ module.exports = class extends Command {
           embed.updateMessage();
 
           embed.actionRow(
-            new Button({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}`, emoji: { name: '◀️' } }),
-            new Button({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}`, emoji: { name: '▶️' } })
+            new Button({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}`, emoji: { id: null, name: '◀️' } }),
+            new Button({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}`, emoji: { id: null, name: '▶️' } })
           );
 
           return embed;
