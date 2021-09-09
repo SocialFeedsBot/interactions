@@ -29,6 +29,7 @@ module.exports = class extends Command {
         type: ApplicationCommandOptionType.String,
         name: 'status',
         description: 'Status type',
+        required: true,
         choices: [{
           name: 'major',
           value: 'major'
