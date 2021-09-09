@@ -26,7 +26,7 @@ module.exports = class extends Command {
       description: 'Set status page message.',
       isDeveloper: true,
       options: [{
-        type: ApplicationCommandOptionType.SubCommand,
+        type: ApplicationCommandOptionType.String,
         name: 'status',
         description: 'Status type',
         choices: [{
