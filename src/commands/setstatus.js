@@ -29,7 +29,6 @@ module.exports = class extends Command {
         type: ApplicationCommandOptionType.SubCommandGroup,
         name: 'status',
         description: 'Status type',
-        required: true,
         options: [{
           name: 'major',
           description: 'Red status',
