@@ -26,23 +26,20 @@ module.exports = class extends Command {
       description: 'Set status page message.',
       isDeveloper: true,
       options: [{
-        type: ApplicationCommandOptionType.SubCommandGroup,
+        type: ApplicationCommandOptionType.SubCommand,
         name: 'status',
         description: 'Status type',
-        options: [{
+        choices: [{
           name: 'major',
-          description: 'Red status',
-          type: ApplicationCommandOptionType.SubCommand
+          value: 'major'
         },
         {
           name: 'warn',
-          description: 'Yellow/amber status',
-          type: ApplicationCommandOptionType.SubCommand
+          value: 'warn'
         },
         {
           name: 'ok',
-          description: 'Green status',
-          type: ApplicationCommandOptionType.SubCommand
+          value: 'ok'
         }]
       },
       {
