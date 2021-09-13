@@ -21,6 +21,15 @@ class InteractionResponse {
   }
 
   /**
+   * Set the type to ack and edit response later
+   * @returns {InteractionResponse}
+   */
+  ack () {
+    this.type = InteractionResponseType.AcknowledgeWithSource;
+    return this;
+  }
+
+  /**
    * Set the message content
    * @param {string} content
    * @returns {InteractionResponse}
@@ -65,7 +74,7 @@ class InteractionResponse {
     const result = {
       type: this.type,
       data: {
-        components: this.components
+        components: this.components.map(c => c.toJSON())
       }
     };
     if (this.flags) result.data.flags = this.flags;

@@ -16,6 +16,7 @@ module.exports = class extends Command {
 
   async run ({ guildID }) {
     let ram = process.memoryUsage().heapUsed;
+    let serverCount = 0;
 
     const { body: feeds, success } = await this.core.api.getAllFeeds();
     const { body: thisServer } = guildID ? await this.core.api.getGuildFeeds(guildID) : { success: false, body: null };
@@ -32,11 +33,15 @@ module.exports = class extends Command {
     if (this.core.gatewayClient.connected) {
       let mem = await this.core.gatewayClient.action('stats', { name: 'interactions' });
       ram = mem.reduce((acc, val) => acc + val.memory, 0);
+
+      let stats = await this.core.gatewayClient.action('stats', { name: 'shards' });
+      serverCount = stats.reduce((a, b) => a + b.guilds, 0);
     }
 
     return new Command.InteractionEmbedResponse()
       .setColour('orange')
       .setTitle('Statistics')
+      .setFooter(`interactions-${this.core.id}`)
       .setThumbnail(Endpoints.avatarURL(this.core.user.id, this.core.user.avatar))
       .addField('Feeds', stripIndents`:white_small_square: Total feeds: **${feeds.feedCount.toLocaleString()}**
         :white_small_square: Feeds this server: **${thisServer.feedCount.toLocaleString()}**
@@ -49,7 +54,7 @@ module.exports = class extends Command {
       .addField('\u200b', '\u200b', true)
       .addField('Uptime', moment.duration(process.uptime() * 1000).format('D[ days], H[ hours], m[ minutes], s[ seconds]'), true)
       .addField('Memory Usage', this.convertMem(ram), true)
-      .addField('\u200b', '\u200b', true);
+      .addField('Servers', serverCount.toLocaleString(), true);
   }
 
   convertMem (bytes) {

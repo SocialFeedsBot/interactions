@@ -21,7 +21,7 @@ class ActionRowComponent extends MessageComponent {
   }
 
   toJSON() {
-    return { type: ComponentType.ActionRow, components: this.components };
+    return { type: ComponentType.ActionRow, components: this.components.map(c => c.toJSON()) };
   }
 
 }

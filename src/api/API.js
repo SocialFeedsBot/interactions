@@ -33,6 +33,10 @@ module.exports = class API {
     return this.api.feeds.delete({ ...data, guildID });
   }
 
+  setStatus (body) {
+    return this.api.status.messages.patch(body);
+  }
+
   request (method, path, data, query) {
     return new Promise(resolve => {
       superagent[method](`${this.url}/${path}`)

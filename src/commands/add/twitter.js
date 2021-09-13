@@ -33,18 +33,22 @@ module.exports = class extends Command {
     });
   }
 
-  async run ({ member, guildID, args: [account, channel, replies, msg] }) {
+  async run ({ id, token, member, guildID, args: [account, channel, replies, msg] }) {
     if (![0, 5].includes(channel.type)) {
       return new Command.InteractionResponse()
         .setContent('Channel can only be a text channel.')
-        .setEmoji('xmark');
+        .setEmoji('xmark')
+        .setEphemeral();
     }
     if (!member.permissions.has('manageWebhooks')) {
       return new Command.InteractionResponse()
         .setContent('You need the **Manage Webhooks** permission to run this command!')
-        .setEmoji('xmark');
+        .setEmoji('xmark')
+        .setEphemeral();
     }
 
+    await this.core.rest.api.interactions(id, token).callback.post(new Command.InteractionResponse()
+      .ack());
     account = verifyFeed('twitter', account);
 
     const { success, message, body } = await this.core.api.createNewFeed(guildID, {
@@ -56,17 +60,21 @@ module.exports = class extends Command {
     });
 
     if (!success) {
-      return new Command.InteractionEmbedResponse()
-        .setContent('Something went wrong when creating this feed, please report the error if it continues.')
-        .setDescription(message)
-        .setColour('red');
+      return this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(
+        new Command.InteractionEmbedResponse()
+          .setContent('Something went wrong when creating this feed, please report the error if it continues.')
+          .setDescription(message)
+          .setColour('red').toJSON().data
+      );
     }
 
-    return new Command.InteractionEmbedResponse()
-      .setColour('green')
-      .setAuthor(body.feedData.title, body.feedData.icon)
-      .setDescription(`Successfully added feed in \`#${channel.name}\`!`)
-      .setEmoji('check');
+    return this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(
+      new Command.InteractionEmbedResponse()
+        .setColour('green')
+        .setAuthor(body.feedData.title, body.feedData.icon)
+        .setDescription(`Successfully added feed in \`#${channel.name}\`!`)
+        .setEmoji('check').toJSON().data
+    );
   }
 
 };
