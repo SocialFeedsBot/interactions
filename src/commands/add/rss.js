@@ -23,11 +23,16 @@ module.exports = class extends Command {
         description: 'A message to tag along with new posts, you can use this to notify roles/people.',
         type: ApplicationCommandOptionType.String,
         required: false
+      }, {
+        name: 'no-embed',
+        description: 'Send the message as plain text rather than an embed.',
+        type: ApplicationCommandOptionType.Boolean,
+        required: false
       }]
     });
   }
 
-  async run ({ id, token, member, guildID, args: [url, channel, msg] }) {
+  async run ({ id, token, member, guildID, args: [url, channel, msg, noembed] }) {
     if (![0, 5].includes(channel.type)) {
       return new Command.InteractionResponse()
         .setContent('Channel can only be a text channel.')
@@ -48,7 +53,7 @@ module.exports = class extends Command {
       type: 'rss',
       channelID: channel.id,
       nsfw: !!channel.nsfw,
-      options: { replies: false, message: msg }
+      options: { replies: false, message: msg, noEmbed: noembed }
     });
 
     if (!success) {
