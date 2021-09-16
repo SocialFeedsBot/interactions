@@ -1,4 +1,4 @@
-const { avatarURL, defaultAvatarURL } = require('../constants/Endpoints');
+const { avatarURL, defaultAvatarURL } = require('../../constants/Endpoints');
 
 class User {
 

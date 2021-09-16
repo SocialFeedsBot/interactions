@@ -3,5 +3,6 @@ module.exports = {
   ApplicationCommandOption: require('./ApplicationCommandOption'),
   Interaction: require('./Interaction'),
   InteractionResponse: require('./InteractionResponse'),
-  InteractionEmbedResponse: require('./InteractionEmbedResponse')
+  InteractionEmbedResponse: require('./InteractionEmbedResponse'),
+  InteractionCommandOption: require('./InteractionCommandOption')
 };

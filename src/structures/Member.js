@@ -1,5 +1,5 @@
-const Permission = require('./Permission');
-const User = require('./User');
+const Permission = require('./discord/Permission');
+const User = require('./discord/User');
 
 class Member {
 

@@ -1,4 +1,4 @@
-const PermissionFlags = require('../constants/Permissions');
+const PermissionFlags = require('../../constants/Permissions');
 
 class Permission {
 

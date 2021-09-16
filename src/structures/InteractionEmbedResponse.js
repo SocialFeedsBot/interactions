@@ -1,5 +1,5 @@
 const InteractionResponse = require('./InteractionResponse');
-const User = require('./User');
+const User = require('./discord/User');
 const { resolveColour } = require('../constants/Colours');
 const { resolveEmoji } = require('../constants/Emojis');
 
