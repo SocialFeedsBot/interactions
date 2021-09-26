@@ -1,8 +1,9 @@
 module.exports = {
-  ApplicationCommand: require('./ApplicationCommand'),
-  ApplicationCommandOption: require('./ApplicationCommandOption'),
-  Interaction: require('./Interaction'),
+  Interaction: require('./interactions/Interaction'),
+  InteractionButton: require('./interactions/InteractionButton'),
+  InteractionCommand: require('./interactions/InteractionCommand'),
+  InteractionCommandOption: require('./interactions/InteractionCommandOption'),
   InteractionResponse: require('./InteractionResponse'),
   InteractionEmbedResponse: require('./InteractionEmbedResponse'),
-  InteractionCommandOption: require('./InteractionCommandOption')
+  InteractionSelect: require('./interactions/InteractionSelect')
 };

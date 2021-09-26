@@ -1,10 +1,12 @@
+const { ApplicationCommandType } = require('../constants/Types');
+
 class Command {
 
-  constructor (core, options = {}) {
+  constructor (core, init = {}, options = {}) {
     this._core = core;
     this.isDeveloper = options.isDeveloper || false;
     this.name = options.name;
-    this.type = options.type;
+    this.type = init.type ?? ApplicationCommandType.CHAT_INPUT;
     this.description = options.description;
     this.options = options.options || [];
     this.choices = options.choices || [];

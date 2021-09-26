@@ -1,7 +1,19 @@
 // INTERACTIONS: Main command dispatcher.
 
-const { InteractionType, InteractionResponseType } = require('../constants/Types');
-const { Interaction, ApplicationCommand, InteractionResponse, InteractionEmbedResponse } = require('../structures');
+const {
+  InteractionType,
+  InteractionResponseType,
+  ApplicationCommandOptionType,
+  ComponentType,
+  SubCommandTypes
+} = require('../constants/Types');
+const {
+  InteractionButton,
+  InteractionCommand,
+  InteractionResponse,
+  InteractionEmbedResponse,
+  InteractionSelect
+} = require('../structures');
 const CommandStore = require('./CommandStore');
 
 module.exports = class Dispatch {
@@ -10,68 +22,79 @@ module.exports = class Dispatch {
     this.logger = logger.extension('Dispatch');
     this.core = core;
     this.commandStore = new CommandStore(core);
-
-    this.awaiting = new Map();
   }
 
   async handleInteraction (data) {
-    const interaction = new Interaction(data);
-    switch (interaction.type) {
+    switch (data.type) {
       case InteractionType.Ping:
         return {
           type: InteractionResponseType.Pong
         };
 
       case InteractionType.ApplicationCommand:
-        return this.handleCommand(interaction)
+        return this.handleCommand(new InteractionCommand(data))
           .catch(this.handleError.bind(this));
 
       case InteractionType.MessageComponent:
-        return this.handleComponent(interaction)
-          .catch(this.handleError.bind(this));
+        switch (data.data.component_type) {
+          case ComponentType.Button:
+            return this.handleComponent(new InteractionButton(data))
+              .catch(this.handleError.bind(this));
+
+          case ComponentType.SelectMenu:
+            return this.handleComponent(new InteractionSelect(data))
+              .catch(this.handleError.bind(this));
+
+          default:
+            return null;
+        }
 
       default:
-        this.logger.warn(`Unknown interaction type "${interaction.type}" received`);
+        this.logger.warn(`Unknown interaction type "${data.type}" received`);
         return {};
     }
   }
 
   async handleCommand (interaction) {
-    const applicationCommand = new ApplicationCommand(interaction.data);
+    const topLevelCommand = this.commandStore.get(interaction.name);
+    const applicationCommand = this.getSubCommand(interaction, topLevelCommand);
+    if (!applicationCommand) return null;
+
     const context = {
       ...interaction,
       user: interaction.member ? interaction.member.user : interaction.user,
-      args: applicationCommand.args
+      args: {}
     };
 
-    //  Check for a global command
-    const command = this.commandStore.get(applicationCommand.commandName);
-    if (command) {
-      // check disabled
-      const disabled = await this.core.redis.get(`commands:${applicationCommand.commandName}:disabled`);
-      if (disabled && disabled !== 'no') {
-        return new InteractionEmbedResponse()
-          .setContent('This command is disabled')
-          .setDescription(`**Reason:** ${disabled}`)
-          .setColour('red');
-      }
-
-      // metrics
-      await this.core.prometheus.gauge('inc', 'commandsRan', 1);
-
-      // run
-      return (await command.run(context)) ||
-        new InteractionEmbedResponse()
-          .setDescription('Missing response')
-          .setColor('red');
+    const args = this.findNonSubCommandOption(interaction.options);
+    if (args) {
+      args.forEach(option => {
+        context.args[option.name] = option;
+      });
     }
 
-    return true;
+    //  Check for a global command
+    const disabled = await this.core.redis.get(`commands:${applicationCommand.name}:disabled`);
+    if (disabled && disabled !== 'no') {
+      return new InteractionEmbedResponse()
+        .setContent('This command is disabled')
+        .setDescription(`**Reason:** ${disabled}`)
+        .setColour('red');
+    }
+
+    // metrics
+    await this.core.prometheus.gauge('inc', 'commandsRan', 1);
+
+    // run
+    return (await applicationCommand.run(context)) ||
+      new InteractionEmbedResponse()
+        .setDescription('Missing response')
+        .setColour('red');
   }
 
   async handleComponent (interaction) {
     // find in redis
-    let data = await this.core.redis.get(`interactions:awaits:${interaction.data.custom_id}`);
+    let data = await this.core.redis.get(`interactions:awaits:${interaction.customID}`);
     if (!data) {
       return new InteractionResponse()
         .setContent('Interaction timed out')
@@ -80,9 +103,36 @@ module.exports = class Dispatch {
     }
     data = JSON.parse(data);
     if (data.removeOnResponse) {
-      await this.core.redis.del(`interactions:awaits:${interaction.data.custom_id}`);
+      await this.core.redis.del(`interactions:awaits:${interaction.customID}`);
     }
-    return this.commandStore.get(data.command).handleComponent(data, interaction);
+
+    const topLevelCommand = this.commandStore.get(data.command);
+    const applicationCommand = this.getSubCommand(interaction, topLevelCommand);
+    if (!applicationCommand) return null;
+
+    return applicationCommand.handleComponent(data, interaction);
+  }
+
+  getSubCommand (interactionCommand, command) {
+    if (!command) {
+      return null;
+    }
+
+    if ([ApplicationCommandOptionType.SubCommand, ApplicationCommandOptionType.SubCommandGroup].includes(interactionCommand.options?.[0]?.type)) {
+      command = command.options.find(option => option.name === interactionCommand.options[0].name);
+      if (command) {
+        return this.getSubCommand(interactionCommand.options[0], command);
+      }
+    }
+
+    return command;
+  }
+
+  findNonSubCommandOption (options) {
+    if (SubCommandTypes.includes(options?.[0].type)) {
+      return this.findNonSubCommandOption(options[0].options);
+    }
+    return options;
   }
 
   /**

@@ -60,11 +60,12 @@ module.exports = class extends Command {
     this.awaitingClicks = new Map();
   }
 
-  async run ({ args: [status, title, message] }) {
-    return this.core.api.setStatus({ head: title, body: message, status }).then(({ body: res }) => new Command.InteractionResponse()
-      .setContent(`\`\`\`js\n${res}\n\`\`\``)
-    ).catch(e => new Command.InteractionResponse()
-      .setContent(`**:x: Error!**\`\`\`js\n${e.stack || e.message}\n\`\`\``));
+  async run ({ args: { status, title, message } }) {
+    return this.core.api.setStatus({ head: title.value, body: message.value, status: status.value })
+      .then(({ body: res }) => new Command.InteractionResponse()
+        .setContent(`\`\`\`js\n${require('util').inspect(res)}\n\`\`\``)
+      ).catch(e => new Command.InteractionResponse()
+        .setContent(`**:x: Error!**\`\`\`js\n${e.stack || e.message}\n\`\`\``));
   }
 
 };

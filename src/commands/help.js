@@ -1,6 +1,5 @@
 const { ComponentButtonStyle } = require('../constants/Types');
 const Command = require('../framework/Command');
-const Button = require('../structures/ButtonComponent');
 
 module.exports = class extends Command {
 
@@ -28,10 +27,8 @@ module.exports = class extends Command {
         '', 'Get started by typing `/add` and following on with the type of feed you would like to add!'
       ].join('\n'))
       .setColour('orange')
-      .actionRow(
-        new Button({ style: ComponentButtonStyle.Link, label: 'Invite me', url: 'https://socialfeeds.app/invite' }),
-        new Button({ style: ComponentButtonStyle.Link, label: 'View Dashboard', url: 'https://socialfeeds.app/dashboard' })
-      );
+      .addButton({ label: 'Invite me', url: 'https://socialfeeds.app/invite' })
+      .addButton({ style: ComponentButtonStyle.Link, label: 'View Dashboard', url: 'https://socialfeeds.app/dashboard' });
   }
 
 };

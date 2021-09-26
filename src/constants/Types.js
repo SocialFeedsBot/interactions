@@ -24,8 +24,10 @@ module.exports = {
     Pong: 1,
     ChannelMessageWithSource: 4,
     AcknowledgeWithSource: 5,
-    DeferredUpdateMessage: 6, // COMPONENTS
-    UpdateMessage: 7 // COMPONENTS
+    /** COMPONENTS ONLY */
+    DeferredUpdateMessage: 6,
+    /** COMPONENTS ONLY */
+    UpdateMessage: 7
   },
 
   MessageFlags: {
@@ -38,6 +40,12 @@ module.exports = {
     Ephemeral: 1 << 6
   },
 
+  ApplicationCommandType: {
+    CHAT_INPUT:	1,
+    USER:	2,
+    MESSAGE:	3
+  },
+
   ApplicationCommandOptionType: {
     SubCommand: 1,
     SubCommandGroup: 2,
@@ -47,6 +55,8 @@ module.exports = {
     User: 6,
     Channel: 7,
     Role: 8
-  }
+  },
+
+  SubCommandTypes: [1, 2]
 
 };

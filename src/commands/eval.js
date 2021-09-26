@@ -26,7 +26,7 @@ module.exports = class extends Command {
     const { get, post, patch } = superagent;
     let res;
     try {
-      const result = await eval(ctx.args[0]);
+      const result = await eval(ctx.args.code.value);
       res = `\`\`\`js\n${require('util').inspect(result, { depth: 0 }).substring(0, 1800)}\n\`\`\``;
     } catch(err) {
       res = `\`\`\`js\n${err.stack}\n\`\`\``;

@@ -1,6 +1,5 @@
 const Command = require('../framework/Command');
 const { ApplicationCommandOptionType, ComponentButtonStyle } = require('../constants/Types');
-const Button = require('../structures/ButtonComponent');
 
 module.exports = class extends Command {
 
@@ -42,10 +41,8 @@ module.exports = class extends Command {
 
       let page = Math.min(1, chunks.length) || 1;
       let embed = this.generatePage(page, channel, allDocs, chunks)
-        .actionRow(
-          new Button({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}` }),
-          new Button({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}` })
-        );
+        .addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}` })
+        .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}` });
 
       this.awaitingButtons.set(`pagination:prevpage.${guildID}:${channel.id}`, {
         userID: member ? member.user.id : user.id,
@@ -55,10 +52,8 @@ module.exports = class extends Command {
           embed = this.generatePage(page, channel, allDocs, chunks);
           embed.updateMessage();
 
-          embed.actionRow(
-            new Button({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}` }),
-            new Button({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: (page - 1) === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}` })
-          );
+          embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}` })
+            .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: (page - 1) === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}` });
 
           return embed;
         }
@@ -72,10 +67,8 @@ module.exports = class extends Command {
           embed = this.generatePage(page, channel, allDocs, chunks);
           embed.updateMessage();
 
-          embed.actionRow(
-            new Button({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}`, emoji: { id: null, name: '◀️' } }),
-            new Button({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}`, emoji: { id: null, name: '▶️' } })
-          );
+          embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}`, emoji: { id: null, name: '◀️' } })
+            .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}`, emoji: { id: null, name: '▶️' } });
 
           return embed;
         }

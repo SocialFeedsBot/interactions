@@ -1,4 +1,4 @@
-const Member = require('./Member');
+const Member = require('../discord/Member');
 
 class Interaction {
 

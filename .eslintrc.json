@@ -2,11 +2,13 @@
   "extends": "eslint:recommended",
   "env": {
     "node": true,
-    "es2020": true
+    "browser": true,
+    "es2021": true
   },
   "globals": {},
   "parserOptions": {
-    "ecmaVersion": 2020
+    "ecmaVersion": 12,
+    "sourceType": "module"
   },
 
   "rules": {

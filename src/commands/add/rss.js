@@ -32,8 +32,8 @@ module.exports = class extends Command {
     });
   }
 
-  async run ({ id, token, member, guildID, args: [url, channel, msg, noembed] }) {
-    if (![0, 5].includes(channel.type)) {
+  async run ({ id, token, member, guildID, args }) {
+    if (![0, 5].includes(args.channel.channel.type)) {
       return new Command.InteractionResponse()
         .setContent('Channel can only be a text channel.')
         .setEmoji('xmark')
@@ -49,11 +49,11 @@ module.exports = class extends Command {
       .ack());
 
     const { success, message, body } = await this.core.api.createNewFeed(guildID, {
-      url,
+      url: args.url.value,
       type: 'rss',
-      channelID: channel.id,
-      nsfw: !!channel.nsfw,
-      options: { replies: false, message: msg, noEmbed: noembed }
+      channelID: args.channel.value,
+      nsfw: !!args.channel.channel.nsfw,
+      options: { replies: false, message: args.message?.value, noEmbed: args['no-embed']?.value }
     });
 
     if (!success) {
@@ -69,7 +69,7 @@ module.exports = class extends Command {
       new Command.InteractionEmbedResponse()
         .setColour('green')
         .setAuthor(body.feedData.title, body.feedData.icon)
-        .setDescription(`Successfully added feed in \`#${channel.name}\`!`)
+        .setDescription(`Successfully added feed in \`#${args.channel.channel.name}\`!`)
         .setEmoji('check').toJSON().data
     );
   }

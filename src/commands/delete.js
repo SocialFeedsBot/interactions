@@ -1,7 +1,5 @@
 const { ApplicationCommandOptionType, ComponentButtonStyle, ComponentType } = require('../constants/Types');
 const Command = require('../framework/Command');
-const Button = require('../structures/ButtonComponent');
-const Select = require('../structures/SelectComponent');
 
 module.exports = class extends Command {
 
@@ -18,8 +16,8 @@ module.exports = class extends Command {
     });
   }
 
-  async run ({ id, token, guildID, member, user, args: [channel] }) {
-    if (![0, 5].includes(channel.type)) {
+  async run ({ id, token, guildID, member, user, args }) {
+    if (![0, 5].includes(args.channel.channel.type)) {
       return new Command.InteractionResponse()
         .setContent('Channel can only be a text channel.')
         .setEmoji('xmark')
@@ -35,7 +33,7 @@ module.exports = class extends Command {
     await this.core.rest.api.interactions(id, token).callback.post(new Command.InteractionResponse()
       .ack());
     let { body: { feeds } } = await this.core.api.getGuildFeeds(guildID);
-    feeds = feeds.filter(f => f.channelID === channel.id);
+    feeds = feeds.filter(f => f.channelID === args.channel.value);
 
     await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}`, JSON.stringify({
       command: 'delete',
@@ -60,35 +58,36 @@ module.exports = class extends Command {
       .setContent('Select the feeds you want to remove');
 
     chunks.forEach((chunk, i) => {
-      resp.actionRow(new Select({
-        id: `deleteselect-${user.id}`,
+      resp.addSelectMenu({
+        custom_id: `deleteselect-${user.id}`,
         placeholder: `Click to see feeds (page ${i + 1})`,
         options: chunk,
-        maxValues: chunk.length
-      }));
+        max_values: chunk.length
+      });
     });
 
-    resp.actionRow(new Button({
+    resp.addActionRow();
+    resp.addButton({
       style: ComponentButtonStyle.Red,
       label: 'Cancel',
-      id: `cancel-deleteselect-${user.id}`
-    }));
+      custom_id: `cancel-deleteselect-${user.id}`
+    });
 
     return await this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(resp.toJSON().data);
   }
 
   async handleComponent (data, interaction) {
-    if (interaction.member.id !== data.userID) {
+    if (interaction.member.user.id !== data.userID) {
       return null;
     }
 
-    if (interaction.data.component_type === ComponentType.Button) {
+    if (interaction.componentType === ComponentType.Button) {
       return new Command.InteractionResponse()
         .updateMessage()
         .setContent('Select menu cancelled');
     }
 
-    const toRemove = interaction.data.values;
+    const toRemove = interaction.values;
 
     let promises = [];
     toRemove.forEach(value => {

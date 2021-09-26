@@ -1,6 +1,7 @@
-const config = require('../../config');
 const fs = require('fs');
 const path = require('path');
+const config = require('../../config');
+const { ApplicationCommandOptionType } = require('../constants/Types');
 
 module.exports = class CommandStore extends Map {
 
@@ -19,11 +20,16 @@ module.exports = class CommandStore extends Map {
       const inPath = fs.readdirSync(dir);
       inPath.forEach(cmd => {
         if (cmd.endsWith('.ignore')) {
-          // ignore
+          // Ignore, better than disabling cus Discord
         } else if (!cmd.endsWith('.js')) {
-          readDirectory(`${dir}/${cmd}`);
+          this.registerSubCommands(`${dir}/${cmd}`);
         } else {
-          this.registerCommand(`${dir}/${cmd}`);
+          const Command = require(path.join(dir, cmd));
+          const commandName = cmd.slice(0, -3);
+          const command = new Command(this.core, {
+            name: commandName
+          });
+          this.set(commandName, command);
         }
       });
     };
@@ -31,92 +37,42 @@ module.exports = class CommandStore extends Map {
     readDirectory(path.resolve('src', 'commands'));
   }
 
-  registerCommand (dir) {
-    const Command = require(dir);
-    const index = dir.indexOf('commands/') + 9;
-    dir = dir.substring(index).replace(/\/index.js/g, '').replace(/.js/g, '');
-    this.set(dir, new Command(this.core));
+  registerSubCommands (dir) {
+    const commands = fs.readdirSync(dir);
+    const Command = require(path.join(dir, 'index.js'));
+    const command = new Command(this.core, {
+      name: dir.substring(dir.lastIndexOf('/'))
+    });
+    this.set(command.name, command);
+
+    commands.filter(c => c !== 'index.js').forEach(commandName => {
+      const SubCommand = require(path.join(dir, commandName));
+      const subCommand = new SubCommand(this.core, {
+        name: commandName,
+        type: ApplicationCommandOptionType.SubCommand
+      });
+      command.options.push(subCommand);
+    });
   }
-
-  commandList () {
-    //  Bit of a hacky way to construct the command list
-    const result = [];
-    const awaiting = {};
-    for (let key of [...this.keys()]) {
-      const route = key.split('/');
-      const command = this.get(key).toJSON();
-      if (command.isDeveloper) continue;
-
-      if (route.length === 1) {
-        if (awaiting[route[0]]) {
-          command.options = [...command.options, ...awaiting[route[0]]];
-          result.push(command);
-          delete awaiting[route[0]];
-        } else {
-          result.push(command);
-        }
-      } else if (route.length === 2) {
-        const main = result.find(c => c.name === route[0]);
-        if (!main) {
-          if (!awaiting[route[0]]) {
-            awaiting[route[0]] = [command];
-          } else {
-            awaiting[route[0]].push(command);
-          }
-        } else {
-          main.options.push(command);
-        }
-      }
-    }
-
-    return result;
-  }
-
-  developerCommandList () {
-    const result = [];
-    const awaiting = {};
-    for (let key of [...this.keys()]) {
-      const route = key.split('/');
-      const command = this.get(key).toJSON();
-      if (!command.isDeveloper) continue;
-
-      if (route.length === 1) {
-        if (awaiting[route[0]]) {
-          command.options = [...command.options, ...awaiting[route[0]]];
-          result.push(command);
-          delete awaiting[route[0]];
-        } else {
-          result.push(command);
-        }
-      } else if (route.length === 2) {
-        const main = result.find(c => c.name === route[0]);
-        if (!main) {
-          if (!awaiting[route[0]]) {
-            awaiting[route[0]] = [command];
-          } else {
-            awaiting[route[0]].push(command);
-          }
-        } else {
-          main.options.push(command);
-        }
-      }
-    }
-
-    return result;
-  }
-
   /**
    * Update the global commands
    * @returns {Promise<*>}
    */
   async updateCommandList() {
+    // dev commands
     await this.core.rest.api.applications(config.applicationID)
       .guilds(config.devServerID)
       .commands()
-      .put(this.developerCommandList());
-    return this.core.rest.api
-      .applications(config.applicationID)
+      .put([...this.values()]
+        .filter(c => c.isDeveloper)
+        .map(v => v.toJSON())
+      );
+    // normal command
+    return await this.core.rest.api.applications(config.applicationID)
       .commands()
-      .put(this.commandList());
+      .put([...this.values()]
+        .filter(c => !c.isDeveloper)
+        .map(v => v.toJSON())
+      );
   }
 };

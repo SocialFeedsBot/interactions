@@ -1,7 +1,7 @@
-const User = require('./discord/User');
-const Channel = require('./discord/Channel');
-const Role = require('./discord/Role');
-const Member = require('./discord/Member');
+const User = require('../discord/User');
+const Channel = require('../discord/Channel');
+const Role = require('../discord/Role');
+const Member = require('../discord/Member');
 
 module.exports = class InteractionCommandOption {
 
