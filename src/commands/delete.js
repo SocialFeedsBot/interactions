@@ -1,4 +1,4 @@
-const { ApplicationCommandOptionType, ComponentButtonStyle, ComponentType } = require('../constants/Types');
+const { ApplicationCommandOptionType, ComponentButtonStyle, ComponentType, ChannelType } = require('../constants/Types');
 const Command = require('../framework/Command');
 
 module.exports = class extends Command {
@@ -11,18 +11,13 @@ module.exports = class extends Command {
         type: ApplicationCommandOptionType.Channel,
         name: 'channel',
         description: 'Channel to remove the feed from.',
-        required: true
+        required: true,
+        channel_types: [ChannelType.Text, ChannelType.News]
       }]
     });
   }
 
   async run ({ id, token, guildID, member, user, args }) {
-    if (![0, 5].includes(args.channel.channel.type)) {
-      return new Command.InteractionResponse()
-        .setContent('Channel can only be a text channel.')
-        .setEmoji('xmark')
-        .setEphemeral();
-    }
     if (!member || !member.permissions.has('manageWebhooks')) {
       return new Command.InteractionResponse()
         .setContent('You need the **Manage Webhooks** permission to run this command!')

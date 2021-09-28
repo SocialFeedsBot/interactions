@@ -1,5 +1,5 @@
 const Command = require('../framework/Command');
-const { ApplicationCommandOptionType, ComponentButtonStyle } = require('../constants/Types');
+const { ApplicationCommandOptionType, ComponentButtonStyle, ChannelType } = require('../constants/Types');
 
 module.exports = class extends Command {
 
@@ -11,18 +11,13 @@ module.exports = class extends Command {
         type: ApplicationCommandOptionType.Channel,
         name: 'channel',
         description: 'Channel to view the feeds of.',
-        required: true
+        required: true,
+        channel_types: [ChannelType.Text, ChannelType.News]
       }]
     });
   }
 
   async run ({ guildID, args: { channel }, user, member, token }) {
-    if (![0, 5].includes(channel.channel.type)) {
-      return new Command.InteractionResponse()
-        .setContent('Channel can only be a text channel.')
-        .setEmoji('xmark');
-    }
-
     let { success, docs: allDocs } = await this.getFeeds(guildID);
     if (!success) {
       return new Command.InteractionResponse()
