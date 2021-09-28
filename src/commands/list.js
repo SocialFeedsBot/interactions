@@ -16,8 +16,8 @@ module.exports = class extends Command {
     });
   }
 
-  async run ({ guildID, args: [channel], user, member, token }) {
-    if (![0, 5].includes(channel.type)) {
+  async run ({ guildID, args: { channel }, user, member, token }) {
+    if (![0, 5].includes(channel.channel.type)) {
       return new Command.InteractionResponse()
         .setContent('Channel can only be a text channel.')
         .setEmoji('xmark');
@@ -30,7 +30,7 @@ module.exports = class extends Command {
         .setEmoji('xmark');
     }
 
-    let docs = allDocs.filter(doc => doc.channelID === channel.id);
+    let docs = allDocs.filter(doc => doc.channelID === channel.value);
     if (!docs.length) {
       return new Command.InteractionResponse()
         .setContent('There are no feeds setup in this channel.')
@@ -40,16 +40,16 @@ module.exports = class extends Command {
       while (docs.length > 0) chunks.push(docs.splice(0, 5));
 
       let page = Math.min(1, chunks.length) || 1;
-      let embed = this.generatePage(page, channel, allDocs, chunks)
+      let embed = this.generatePage(page, channel.channel, allDocs, chunks)
         .addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}` })
         .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, id: `list.pagination:nextpage.${guildID}:${channel.id}` });
 
-      this.awaitingButtons.set(`pagination:prevpage.${guildID}:${channel.id}`, {
+      this.awaitingButtons.set(`pagination:prevpage.${guildID}:${channel.value}`, {
         userID: member ? member.user.id : user.id,
         deleteAfter: false,
         func: () => {
           page = Math.min(page - 1, chunks.length) || 1;
-          embed = this.generatePage(page, channel, allDocs, chunks);
+          embed = this.generatePage(page, channel.channel, allDocs, chunks);
           embed.updateMessage();
 
           embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}` })
@@ -59,12 +59,12 @@ module.exports = class extends Command {
         }
       });
 
-      this.awaitingButtons.set(`pagination:nextpage.${guildID}:${channel.id}`, {
+      this.awaitingButtons.set(`pagination:nextpage.${guildID}:${channel.value}`, {
         userID: member ? member.user.id : user.id,
         deleteAfter: false,
         func: () => {
           page = Math.min(page + 1, chunks.length);
-          embed = this.generatePage(page, channel, allDocs, chunks);
+          embed = this.generatePage(page, channel.channel, allDocs, chunks);
           embed.updateMessage();
 
           embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, id: `list.pagination:prevpage.${guildID}:${channel.id}`, emoji: { id: null, name: '◀️' } })
@@ -75,8 +75,8 @@ module.exports = class extends Command {
       });
 
       setTimeout(() => {
-        this.awaitingButtons.delete(`pagination:nextpage.${guildID}:${channel.id}`);
-        this.awaitingButtons.delete(`pagination:prevpage.${guildID}:${channel.id}`);
+        this.awaitingButtons.delete(`pagination:nextpage.${guildID}:${channel.value}`);
+        this.awaitingButtons.delete(`pagination:prevpage.${guildID}:${channel.value}`);
 
         this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch({
           components: []
