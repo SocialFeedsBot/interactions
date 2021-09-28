@@ -49,7 +49,7 @@ module.exports = class extends Command {
 
     await this.core.rest.api.interactions(id, token).callback.post(new Command.InteractionResponse()
       .ack());
-    args.account = verifyFeed('youtube', args.account);
+    args.account = verifyFeed('youtube', args.account.value);
 
     const { success, message, body } = await this.core.api.createNewFeed(guildID, {
       url: args.account,
