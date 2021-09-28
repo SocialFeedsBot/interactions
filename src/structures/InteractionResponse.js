@@ -116,7 +116,7 @@ class InteractionResponse {
     const result = {
       type: this.type,
       data: {
-        components: this.components.map(c => c.toJSON ? c.toJSON : c)
+        components: this.components.map(c => c.toJSON ? c.toJSON() : c)
       }
     };
     if (this.flags) result.data.flags = this.flags;
