@@ -120,6 +120,12 @@ module.exports = class extends Command {
     }
 
     let page = Math.min(data.page - 1, data.pages.length) || 1;
+    if (interaction.customID.includes('nextpage')) {
+      page = Math.min(data.page + 1, data.pages.length);
+    } else {
+      page = Math.min(data.page - 1, data.pages.length) || 1;
+    }
+
     let embed = this.generatePage(page, data.channel, data.allDocs, data.pages);
     embed.updateMessage();
 
