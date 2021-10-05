@@ -60,9 +60,9 @@ module.exports = class extends Command {
         userID: user.id
       }));
 
-      setTimeout(() => {
-        this.core.redis.delete(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`);
-        this.awaitingButtons.delete(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`);
+      setTimeout(async () => {
+        await this.core.redis.delete(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`);
+        await this.core.redis.delete(`interactions:awaits:list-prevpage-${guildID}-${channel.value}`);
 
         this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch({
           components: []
