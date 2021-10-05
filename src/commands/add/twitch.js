@@ -44,7 +44,7 @@ module.exports = class extends Command {
 
     await this.core.rest.api.interactions(id, token).callback.post(new Command.InteractionResponse()
       .ack());
-    args.account = verifyFeed('twitch', args.account);
+    args.account = verifyFeed('twitch', args.account.value);
 
     const { success, message, body } = await this.core.api.createNewFeed(guildID, {
       url: args.account,
