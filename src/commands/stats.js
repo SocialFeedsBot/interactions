@@ -18,8 +18,7 @@ module.exports = class extends Command {
     let ram = process.memoryUsage().heapUsed;
     let serverCount = 0;
 
-    const { body: feeds, success } = await this.core.api.getAllFeeds();
-    const { body: thisServer } = guildID ? await this.core.api.getGuildFeeds(guildID) : { success: false, body: null };
+    const { body: thisServer, success } = guildID ? await this.core.api.getGuildFeeds(guildID) : { success: false, body: null };
 
     if (!success) {
       return new Command.InteractionResponse()
@@ -43,7 +42,7 @@ module.exports = class extends Command {
       .setTitle('Statistics')
       .setFooter(`interactions-${this.core.id}`)
       .setThumbnail(Endpoints.avatarURL(this.core.user.id, this.core.user.avatar))
-      .addField('Feeds', stripIndents`:white_small_square: Total feeds: **${feeds.feedCount.toLocaleString()}**
+      .addField('Feeds', stripIndents`:white_small_square: Total feeds: **${counts.feedCount.toLocaleString()}**
         :white_small_square: Feeds this server: **${thisServer.feedCount.toLocaleString()}**
         :white_small_square: Twitter: **${counts.twitter.toLocaleString()}**
         :white_small_square: Twitch: **${counts.twitch.toLocaleString()}**`, true)
