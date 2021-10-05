@@ -61,8 +61,8 @@ module.exports = class extends Command {
       }));
 
       setTimeout(async () => {
-        await this.core.redis.delete(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`);
-        await this.core.redis.delete(`interactions:awaits:list-prevpage-${guildID}-${channel.value}`);
+        await this.core.redis.del(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`);
+        await this.core.redis.del(`interactions:awaits:list-prevpage-${guildID}-${channel.value}`);
 
         this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch({
           components: []
@@ -129,8 +129,8 @@ module.exports = class extends Command {
     let embed = this.generatePage(page, data.channel, data.allDocs, data.pages);
     embed.updateMessage();
 
-    embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, custom_id: `interactions:awaits:list-prevpage-${interaction.guildID}-${interaction.channelID}`, emoji: { id: null, name: '◀️' } })
-      .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: (page - 1) === data.pages.length, custom_id: `interactions:awaits:list-nextpage-${interaction.guildID}-${interaction.channelID}`, emoji: { id: null, name: '▶️' } });
+    embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, custom_id: `list-prevpage-${interaction.guildID}-${interaction.channelID}`, emoji: { id: null, name: '◀️' } })
+      .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: (page - 1) === data.pages.length, custom_id: `list-nextpage-${interaction.guildID}-${interaction.channelID}`, emoji: { id: null, name: '▶️' } });
 
     await this.core.redis.set(`interactions:awaits:list-nextpage-${interaction.guildID}-${interaction.channelID}`, JSON.stringify(data));
     await this.core.redis.set(`interactions:awaits:list-prevpage-${interaction.guildID}-${interaction.channelID}`, JSON.stringify(data));
