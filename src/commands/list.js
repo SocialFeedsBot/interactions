@@ -42,6 +42,7 @@ module.exports = class extends Command {
       await this.core.redis.set(`interactions:awaits:list-prevpage-${guildID}-${channel.value}`, JSON.stringify({
         command: 'list',
         pages: chunks,
+        channel: channel.channel.name,
         page,
         allDocs,
         token,
@@ -50,6 +51,7 @@ module.exports = class extends Command {
       }));
       await this.core.redis.set(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`, JSON.stringify({
         command: 'list',
+        channel: channel.channel.name,
         pages: chunks,
         allDocs,
         page,
@@ -121,8 +123,11 @@ module.exports = class extends Command {
     let embed = this.generatePage(page, data.channel, data.allDocs, data.pages);
     embed.updateMessage();
 
-    embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, custom_id: `interactions:awaits:list-prevpage-${interaction.guildID}-${interaction.channelID}` })
-      .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: (page - 1) === data.pages.length, custom_id: `interactions:awaits:list-nextpage-${interaction.guildID}-${interaction.channelID}` });
+    embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, custom_id: `interactions:awaits:list-prevpage-${interaction.guildID}-${interaction.channelID}`, emoji: { id: null, name: '◀️' } })
+      .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: (page - 1) === data.pages.length, custom_id: `interactions:awaits:list-nextpage-${interaction.guildID}-${interaction.channelID}`, emoji: { id: null, name: '▶️' } });
+
+    await this.core.redis.set(`interactions:awaits:list-nextpage-${interaction.guildID}-${interaction.channelID}`, JSON.stringify(data));
+    await this.core.redis.set(`interactions:awaits:list-prevpage-${interaction.guildID}-${interaction.channelID}`, JSON.stringify(data));
 
     return embed;
   }
