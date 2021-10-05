@@ -40,7 +40,7 @@ module.exports = class extends Command {
         .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, custom_id: `list-nextpage-${guildID}-${channel.value}`, emoji: { id: null, name: '▶️' } });
 
       await this.core.redis.set(`interactions:awaits:list-prevpage-${guildID}-${channel.value}`, JSON.stringify({
-        command: 'delete',
+        command: 'list',
         pages: chunks,
         page,
         allDocs,
@@ -49,7 +49,7 @@ module.exports = class extends Command {
         userID: user.id
       }));
       await this.core.redis.set(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`, JSON.stringify({
-        command: 'delete',
+        command: 'list',
         pages: chunks,
         allDocs,
         page,
