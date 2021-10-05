@@ -35,43 +35,32 @@ module.exports = class extends Command {
       while (docs.length > 0) chunks.push(docs.splice(0, 5));
 
       let page = Math.min(1, chunks.length) || 1;
-      let embed = this.generatePage(page, channel.channel, allDocs, chunks)
-        .addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, custom_id: `list.pagination:prevpage.${guildID}:${channel.value}` })
-        .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, custom_id: `list.pagination:nextpage.${guildID}:${channel.value}` });
+      let embed = this.generatePage(page, channel.channel.name, allDocs, chunks)
+        .addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, custom_id: `list-prevpage-${guildID}-${channel.value}`, emoji: { id: null, name: '◀️' } })
+        .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, custom_id: `list-nextpage-${guildID}-${channel.value}`, emoji: { id: null, name: '▶️' } });
 
-      this.awaitingButtons.set(`pagination:prevpage.${guildID}:${channel.value}`, {
-        userID: member ? member.user.id : user.id,
-        deleteAfter: false,
-        func: () => {
-          page = Math.min(page - 1, chunks.length) || 1;
-          embed = this.generatePage(page, channel.channel, allDocs, chunks);
-          embed.updateMessage();
-
-          embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, custom_id: `list.pagination:prevpage.${guildID}:${channel.value}` })
-            .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: (page - 1) === chunks.length, custom_id: `list.pagination:nextpage.${guildID}:${channel.value}` });
-
-          return embed;
-        }
-      });
-
-      this.awaitingButtons.set(`pagination:nextpage.${guildID}:${channel.value}`, {
-        userID: member ? member.user.id : user.id,
-        deleteAfter: false,
-        func: () => {
-          page = Math.min(page + 1, chunks.length);
-          embed = this.generatePage(page, channel.channel, allDocs, chunks);
-          embed.updateMessage();
-
-          embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, custom_id: `list.pagination:prevpage.${guildID}:${channel.value}`, emoji: { id: null, name: '◀️' } })
-            .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: page === chunks.length, custom_id: `list.pagination:nextpage.${guildID}:${channel.value}`, emoji: { id: null, name: '▶️' } });
-
-          return embed;
-        }
-      });
+      await this.core.redis.set(`interactions:awaits:list-prevpage-${guildID}-${channel.value}`, JSON.stringify({
+        command: 'delete',
+        pages: chunks,
+        page,
+        allDocs,
+        token,
+        removeOnResponse: false,
+        userID: user.id
+      }));
+      await this.core.redis.set(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`, JSON.stringify({
+        command: 'delete',
+        pages: chunks,
+        allDocs,
+        page,
+        token,
+        removeOnResponse: false,
+        userID: user.id
+      }));
 
       setTimeout(() => {
-        this.awaitingButtons.delete(`pagination:nextpage.${guildID}:${channel.value}`);
-        this.awaitingButtons.delete(`pagination:prevpage.${guildID}:${channel.value}`);
+        this.core.redis.delete(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`);
+        this.awaitingButtons.delete(`interactions:awaits:list-nextpage-${guildID}-${channel.value}`);
 
         this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch({
           components: []
@@ -110,7 +99,7 @@ module.exports = class extends Command {
   generatePage (page, channel, allDocs, chunks) {
     let description = '';
     const embed = new Command.InteractionEmbedResponse()
-      .setTitle(`Feed list for #${channel.name}`)
+      .setTitle(`Feed list for #${channel}`)
       .setColour(16753451)
       .setFooter(`Total feeds: ${allDocs.length} (Page ${page}/${chunks.length})`);
 
@@ -120,6 +109,21 @@ module.exports = class extends Command {
     });
 
     embed.setDescription(`You can now manage your feeds on an online [dashboard](https://socialfeeds.app)\n${description}`);
+    return embed;
+  }
+
+  async handleComponent (data, interaction) {
+    if (interaction.member.user.id !== data.userID) {
+      return null;
+    }
+
+    let page = Math.min(data.page - 1, data.pages.length) || 1;
+    let embed = this.generatePage(page, data.channel, data.allDocs, data.pages);
+    embed.updateMessage();
+
+    embed.addButton({ style: ComponentButtonStyle.Blurple, label: 'Previous Page', disabled: (page - 1) === 0, custom_id: `interactions:awaits:list-prevpage-${interaction.guildID}-${interaction.channelID}` })
+      .addButton({ style: ComponentButtonStyle.Blurple, label: 'Next Page', disabled: (page - 1) === data.pages.length, custom_id: `interactions:awaits:list-nextpage-${interaction.guildID}-${interaction.channelID}` });
+
     return embed;
   }
 
