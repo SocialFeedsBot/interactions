@@ -28,6 +28,7 @@ module.exports = class extends Command {
       ].join('\n'))
       .setColour('orange')
       .addButton({ label: 'Invite me', url: 'https://socialfeeds.app/invite' })
+      .addButton({ label: 'Support server', url: 'https://socialfeeds.app/support' })
       .addButton({ style: ComponentButtonStyle.Link, label: 'View Dashboard', url: 'https://socialfeeds.app/dashboard' });
   }
 
