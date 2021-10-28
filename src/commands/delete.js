@@ -90,7 +90,7 @@ module.exports = class extends Command {
       promises.push(this.core.api.deleteFeed(interaction.guild_id, {
         type: feed.type,
         url: value,
-        webhookID: feed.webhook.id
+        webhookID: feed.webhookID
       }));
     });
 
