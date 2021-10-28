@@ -75,10 +75,15 @@ module.exports = class extends Command {
   }
 
   // return subreddits based on query
-  async handleAutocomplete (options, data) {
+  async handleAutocomplete (options) {
     const query = options.filter(o => o.focused)[0].value;
-    const { body: { data: { children } } } = await superagent.get('https://www.reddit.com/subreddits/search.json')
+    const { body: { data } } = await superagent.get('https://www.reddit.com/subreddits/search.json')
       .query({ q: encodeURIComponent(query) });
+
+    if (!data || !data.children) {
+      return [];
+    }
+    const children = data.children;
 
     return children.splice(0, 24).map(child => ({
       name: child.data.display_name_prefixed,
