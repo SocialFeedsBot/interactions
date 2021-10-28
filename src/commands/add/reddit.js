@@ -1,6 +1,7 @@
 const Command = require('../../framework/Command');
 const { ApplicationCommandOptionType, ChannelType } = require('../../constants/Types');
 const verifyFeed = require('../../util/verifyFeed');
+const superagent = require('superagent');
 
 module.exports = class extends Command {
 
@@ -13,7 +14,8 @@ module.exports = class extends Command {
         name: 'subreddit',
         description: 'The name of the subreddit to add.',
         type: ApplicationCommandOptionType.String,
-        required: true
+        required: true,
+        autocomplete: true
       }, {
         name: 'channel',
         description: 'The channel to post subreddit to.',
@@ -70,6 +72,18 @@ module.exports = class extends Command {
         .setDescription(`Successfully added feed in \`#${args.channel.channel.name}\`!`)
         .setEmoji('check').toJSON().data
     );
+  }
+
+  // return subreddits based on query
+  async handleAutocomplete (options, data) {
+    const query = options.filter(o => o.focused)[0].value;
+    const { body: { data: { children } } } = await superagent.get('https://www.reddit.com/subreddits/search.json')
+      .query({ q: encodeURIComponent(query) });
+
+    return children.splice(0, 24).map(child => ({
+      name: child.data.display_name_prefixed,
+      value: child.data.display_name
+    }));
   }
 
 };

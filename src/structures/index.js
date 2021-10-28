@@ -5,5 +5,6 @@ module.exports = {
   InteractionCommandOption: require('./interactions/InteractionCommandOption'),
   InteractionResponse: require('./InteractionResponse'),
   InteractionEmbedResponse: require('./InteractionEmbedResponse'),
-  InteractionSelect: require('./interactions/InteractionSelect')
+  InteractionSelect: require('./interactions/InteractionSelect'),
+  InteractionAutocomplete: require('./interactions/InteractionAutocomplete')
 };

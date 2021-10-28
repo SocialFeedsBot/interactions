@@ -3,7 +3,8 @@ module.exports = {
   InteractionType: {
     Ping: 1,
     ApplicationCommand: 2,
-    MessageComponent: 3
+    MessageComponent: 3,
+    ApplicationCommandAutocomplete: 4
   },
 
   ComponentType: {
@@ -27,7 +28,8 @@ module.exports = {
     /** COMPONENTS ONLY */
     DeferredUpdateMessage: 6,
     /** COMPONENTS ONLY */
-    UpdateMessage: 7
+    UpdateMessage: 7,
+    ApplicationCommandAutocompleteResult: 8
   },
 
   MessageFlags: {

@@ -12,7 +12,8 @@ const {
   InteractionCommand,
   InteractionResponse,
   InteractionEmbedResponse,
-  InteractionSelect
+  InteractionSelect,
+  InteractionAutocomplete
 } = require('../structures');
 const CommandStore = require('./CommandStore');
 
@@ -48,6 +49,10 @@ module.exports = class Dispatch {
           default:
             return null;
         }
+
+      case InteractionType.ApplicationCommandAutocomplete:
+        return this.handleAutocomplete(new InteractionAutocomplete(data))
+          .catch(this.handleError.bind(this));
 
       default:
         this.logger.warn(`Unknown interaction type "${data.type}" received`);
@@ -111,6 +116,17 @@ module.exports = class Dispatch {
     if (!applicationCommand) return null;
 
     return applicationCommand.handleComponent(data, interaction);
+  }
+
+  async handleAutocomplete (data) {
+    const topLevelCommand = this.commandStore.get(data.data.name);
+    const applicationCommand = this.getSubCommand(data, topLevelCommand);
+    if (!applicationCommand) return null;
+    const options = this.findNonSubCommandOption(data.data.options);
+
+    const result = await applicationCommand.handleAutocomplete(options, data);
+    console.log(result)
+    return { type: InteractionResponseType.ApplicationCommandAutocompleteResult, data: { choices: result } };
   }
 
   getSubCommand (interactionCommand, command) {
