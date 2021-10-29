@@ -58,10 +58,6 @@ module.exports = class Interactions {
       const result = await this.dispatch.handleInteraction(req.body);
       return res.json(result);
     });
-    this.app.get('/update-commands', async (req, res) => {
-      const result = await this.dispatch.commandStore.updateCommandList();
-      return res.json(result);
-    });
   }
 
   /**
