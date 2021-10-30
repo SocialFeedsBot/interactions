@@ -85,7 +85,7 @@ module.exports = class extends Command {
     }
     const children = data.children;
 
-    return children.splice(0, 24).map(child => ({
+    return children.splice(0, 10).map(child => ({
       name: child.data.display_name_prefixed,
       value: child.data.display_name
     }));
