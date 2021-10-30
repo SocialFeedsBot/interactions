@@ -78,7 +78,7 @@ module.exports = class extends Command {
   async handleAutocomplete (options) {
     const query = options.filter(o => o.focused)[0].value;
     const { body: { data } } = await superagent.get('https://www.reddit.com/subreddits/search.json')
-      .query({ q: encodeURIComponent(query) });
+      .query({ q: encodeURIComponent(query), include_over_18: 'on' });
 
     if (!data || !data.children) {
       return [];
