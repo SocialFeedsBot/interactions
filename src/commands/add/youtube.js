@@ -8,7 +8,7 @@ module.exports = class extends Command {
     super(...args, {
       name: 'youtube',
       type: ApplicationCommandOptionType.SubCommand,
-      description: 'Add a new YouTube channel to the server.',
+      description: 'Add a new YouTube channel to the server.\n**!** Adding a new feed will only post new updates from after you add the feed, not old posts.',
       options: [{
         name: 'account',
         description: 'The ID of the channel to add (check the url).',
