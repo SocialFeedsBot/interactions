@@ -7,7 +7,7 @@ module.exports = class extends Command {
     super(...args, {
       name: 'rss',
       type: ApplicationCommandOptionType.SubCommand,
-      description: 'Add a new RSS feed to a channel.\n**!** Adding a new feed will only post new updates from after you add the feed, not old posts.',
+      description: 'Add a new RSS feed to a channel.\n**!** Adding a new feed will only post new updates.',
       options: [{
         name: 'url',
         description: 'The url of the RSS feed.',

@@ -8,7 +8,7 @@ module.exports = class extends Command {
     super(...args, {
       name: 'statuspage',
       type: ApplicationCommandOptionType.SubCommand,
-      description: 'Track a status page of your favourite services to get realtime updates. For example, the [Discord status](https://discordstatus.com) website is supported.\n**!** Adding a new feed will only post new updates from after you add the feed, not old posts.',
+      description: 'Track a status page of your favourite services to get realtime updates.\n**!** Adding a new feed will only post new updates.',
       options: [{
         name: 'url',
         description: 'The url of the status page.',

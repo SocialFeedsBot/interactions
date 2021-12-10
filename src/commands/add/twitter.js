@@ -8,7 +8,7 @@ module.exports = class extends Command {
     super(...args, {
       name: 'twitter',
       type: ApplicationCommandOptionType.SubCommand,
-      description: 'Add a new Twitter feed to the server.\n**!** Adding a new feed will only post new updates from after you add the feed, not old posts.',
+      description: 'Add a new Twitter feed to the server.\n**!** Adding a new feed will only post new updates.',
       options: [{
         name: 'account',
         description: 'The name of the account to add.',

@@ -9,7 +9,7 @@ module.exports = class extends Command {
     super(...args, {
       name: 'reddit',
       type: ApplicationCommandOptionType.SubCommand,
-      description: 'Add a new reddit feed to the server.\n**!** Adding a new feed will only post new updates from after you add the feed, not old posts.',
+      description: 'Add a new reddit feed to the server.\n**!** Adding a new feed will only post new updates.',
       options: [{
         name: 'subreddit',
         description: 'The name of the subreddit to add.',

@@ -8,7 +8,7 @@ module.exports = class extends Command {
     super(...args, {
       name: 'twitch',
       type: ApplicationCommandOptionType.SubCommand,
-      description: 'Add a new Twitch user to the server.\n**!** Adding a new feed will only post new updates from after you add the feed, not old posts.',
+      description: 'Add a new Twitch user to the server.\n**!** Adding a new feed will only post new updates.',
       options: [{
         name: 'account',
         description: 'The name of the channel to add (check the url).',
