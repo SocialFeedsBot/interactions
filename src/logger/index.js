@@ -65,7 +65,7 @@ module.exports = class Logger {
     this.add(string);
     console.log(string);
 
-    if (this.webhook) {
+    if (type === 'error' && this.webhook && !text.startsWith('[WH]')) {
       superagent.post(`https://canary.discord.com/api/webhooks/${this.webhook.id}/${this.webhook.token}`)
         .send({
           embeds: [{
@@ -75,7 +75,20 @@ module.exports = class Logger {
           }]
         })
         .catch((err) => {
-          this.error(`Could not post error message to webhook (${err.message})`);
+          this.error(`[WH] Could not post error message to webhook (${err.message})`);
+          if (err.headers['x-reset-after']) {
+            setTimeout(() => {
+              superagent.post(`https://canary.discord.com/api/webhooks/${this.webhook.id}/${this.webhook.token}`)
+                .send({
+                  embeds: [{
+                    description: `\`\`\`js\n${text}\n\`\`\``,
+                    footer: { text: `Interactions/${this.name}` },
+                    color: 0xeb4634
+                  }]
+                })
+                .catch(e => {})
+            }, Number(err.headers['x-reset-after']) * 1000)
+          }
         })
     }
 
