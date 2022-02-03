@@ -4,7 +4,7 @@ const Interactions = require('./src/Interactions');
 const Logger = require('./src/logger/');
 const config = require('./config');
 
-const logger = new Logger('Core', []);
+const logger = new Logger('Core', [], config.errorWebhook);
 const worker = new GatewayClient(config.gateway.use, 'interactions', config.gateway.address, config.gateway.secret, Number(process.env.NODE_APP_INSTANCE) || 0);
 
 worker
