@@ -1,10 +1,12 @@
 const Extension = require('./Extension');
+const superagent = require('superagent');
 
 module.exports = class Logger {
 
-  constructor(name, sensitive = []) {
+  constructor(name, sensitive = [], webhook) {
     this.name = name;
     this.sensitive = sensitive;
+    this.webhook = webhook;
 
     this.extensions = {};
     this.history = [];
@@ -62,6 +64,20 @@ module.exports = class Logger {
 
     this.add(string);
     console.log(string);
+
+    if (this.webhook) {
+      superagent.post(`https://canary.discord.com/api/webhooks/${this.webhook.id}/${this.webhook.token}`)
+        .send({
+          embeds: [{
+            description: `\`\`\`js\n${text}\n\`\`\``,
+            footer: { text: `Interactions/${this.name}` },
+            color: 0xeb4634
+          }]
+        })
+        .catch((err) => {
+          this.error(`Could not post error message to webhook (${err.message})`);
+        })
+    }
 
     return string;
   }
