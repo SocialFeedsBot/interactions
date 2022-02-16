@@ -76,3 +76,8 @@ module.exports.InteractionEmbedResponse = require('../structures/InteractionEmbe
  * @type {InteractionComponentResponse}
  */
 module.exports.InteractionComponentResponse = require('../structures/InteractionComponentResponse');
+
+/**
+ * @type {InteractionModal}
+ */
+ module.exports.InteractionModal = require('../structures/InteractionModal');

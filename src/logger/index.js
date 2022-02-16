@@ -76,7 +76,7 @@ module.exports = class Logger {
         })
         .catch((err) => {
           this.error(`[WH] Could not post error message to webhook (${err.message})`);
-          if (err.headers['x-reset-after']) {
+          if (err.response.headers['x-reset-after']) {
             setTimeout(() => {
               superagent.post(`https://canary.discord.com/api/webhooks/${this.webhook.id}/${this.webhook.token}`)
                 .send({

@@ -4,13 +4,15 @@ module.exports = {
     Ping: 1,
     ApplicationCommand: 2,
     MessageComponent: 3,
-    ApplicationCommandAutocomplete: 4
+    ApplicationCommandAutocomplete: 4,
+    ModalSubmit: 5
   },
 
   ComponentType: {
     ActionRow: 1,
     Button: 2,
-    SelectMenu: 3
+    SelectMenu: 3,
+    TextInput: 4
   },
 
   ComponentButtonStyle: {
@@ -21,6 +23,11 @@ module.exports = {
     Link: 5
   },
 
+  TextInputStyle: {
+    Short: 1,
+    Paragraph: 2
+  },
+
   InteractionResponseType: {
     Pong: 1,
     ChannelMessageWithSource: 4,
@@ -29,7 +36,8 @@ module.exports = {
     DeferredUpdateMessage: 6,
     /** COMPONENTS ONLY */
     UpdateMessage: 7,
-    ApplicationCommandAutocompleteResult: 8
+    ApplicationCommandAutocompleteResult: 8,
+    Modal: 9
   },
 
   MessageFlags: {

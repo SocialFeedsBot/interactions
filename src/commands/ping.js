@@ -1,4 +1,5 @@
 const Command = require('../framework/Command');
+const { ComponentButtonStyle, TextInputStyle } = require('../constants/Types')
 
 module.exports = class extends Command {
 
@@ -7,8 +8,6 @@ module.exports = class extends Command {
       name: 'ping',
       description: 'Reply with a pong to see if I am working!'
     });
-
-    this.awaitingClicks = new Map();
   }
 
   async run ({ id, token }) {
