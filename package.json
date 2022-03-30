@@ -14,7 +14,7 @@
     "common-tags": "^1.8.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "ioredis": "^4.27.9",
+    "ioredis": "^5.0.2",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
