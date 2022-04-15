@@ -45,7 +45,8 @@ module.exports = class extends Command {
       .addField('Feeds', stripIndents`:white_small_square: Total feeds: **${counts.feedCount.toLocaleString()}**
         :white_small_square: Feeds this server: **${thisServer.feedCount.toLocaleString()}**
         :white_small_square: Twitter: **${counts.twitter.toLocaleString()}**
-        :white_small_square: Twitch: **${counts.twitch.toLocaleString()}**`, true)
+        :white_small_square: Twitch: **${counts.twitch.toLocaleString()}**
+        :white_small_square: Roblox Group: **${counts.rblxGroup.toLocaleString()}**`, true)
       .addField('\u200b', stripIndents`:white_small_square: YouTube: **${counts.youtube.toLocaleString()}**
         :white_small_square: Reddit: **${counts.reddit.toLocaleString()}**
         :white_small_square: RSS: **${counts.rss.toLocaleString()}**
