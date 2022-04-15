@@ -62,7 +62,7 @@ module.exports = class RESTHandler {
           params: query
         };
 
-        this.logger.debug(`${method.toUpperCase()} ${endpoint} ${JSON.stringify(data, '', 0)}`);
+        this.logger.debug(`${method.toUpperCase()} ${endpoint}`);
 
         axios.request(options)
           .then(res => {
@@ -74,7 +74,7 @@ module.exports = class RESTHandler {
 
             //  Reject with an APIError or HTTPError
             const rejectWithError = () => {
-              this.logger.error(`Request to ${endpoint} failed: ${require('util').inspect(res)}`);
+              this.logger.error(`Request to ${endpoint} failed: ${new DiscordAPIError(res)}`);
               if (res.data && res.data.errors) {
                 reject(new DiscordAPIError(res));
               } else {
