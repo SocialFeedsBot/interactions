@@ -1,8 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../../config');
-const { ApplicationCommandOptionType } = require('../constants/Types');
-
+const Types = require('../constants/Types');
 module.exports = class CommandStore extends Map {
 
   constructor (core) {
@@ -16,44 +15,58 @@ module.exports = class CommandStore extends Map {
   }
 
   registerCommands () {
-    const readDirectory = (dir) => {
-      const inPath = fs.readdirSync(dir);
-      inPath.forEach(cmd => {
-        if (cmd.endsWith('.ignore')) {
-          // Ignore, better than disabling cus Discord
-        } else if (!cmd.endsWith('.js')) {
-          this.registerSubCommands(`${dir}/${cmd}`);
-        } else {
-          const Command = require(path.join(dir, cmd));
-          const commandName = cmd.slice(0, -3);
-          const command = new Command(this.core, {
-            name: commandName
-          });
-          this.set(commandName, command);
-        }
-      });
-    };
+    const dir = path.resolve('src', 'commands');
+    const commands = fs.readdirSync(dir);
 
-    readDirectory(path.resolve('src', 'commands'));
+    for (let cmd of commands) {
+      const commandName = cmd.split('.')[0];
+      const Command = require(path.join(dir, cmd));
+      const command = new Command(this.core, {
+        name: commandName
+      });
+      this.set(commandName, command);
+
+      if (!cmd.includes('.js')) {
+        this.registerSubCommands(command, path.join(dir, command.name));
+      }
+    }
   }
 
-  registerSubCommands (dir) {
-    const commands = fs.readdirSync(dir);
-    const Command = require(path.join(dir, 'index.js'));
-    const command = new Command(this.core, {
-      name: dir.substring(dir.lastIndexOf('/'))
-    });
-    this.set(command.name, command);
+  registerSubCommands (command, dir) {
+    const subCommandGroups = fs.readdirSync(dir).filter(c => fs.statSync(path.join(dir, c)).isDirectory());
+    for (let group of subCommandGroups) {
+      this.registerSubCommandGroup(command, path.join(dir, group));
+    }
 
-    commands.filter(c => c !== 'index.js').forEach(commandName => {
-      const SubCommand = require(path.join(dir, commandName));
-      const subCommand = new SubCommand(this.core, {
-        name: commandName,
-        type: ApplicationCommandOptionType.SubCommand
+    const commands = fs.readdirSync(dir)
+      .filter(filename => filename.endsWith('.js') && filename !== 'index.js');
+
+    for (let file of commands) {
+      if (file === 'index.js') {
+        continue;
+      }
+
+      const Command = require(path.join(dir, file));
+      const subCommand = new Command(this.core, {
+        name: file.slice(0, -3),
+        type: Types.ApplicationCommandOptionType.SubCommand
       });
       command.options.push(subCommand);
-    });
+    }
   }
+
+  registerSubCommandGroup(command, dir) {
+    const Command = require(dir);
+    const subCommandGroup = new Command(this.core, {
+      name: command.name,
+      type: Types.ApplicationCommandOptionType.SubCommandGroup
+    });
+
+    command.options.push(subCommandGroup);
+
+    this.registerSubCommands(subCommandGroup, dir);
+  }
+
   /**
    * Update the global commands
    * @returns {Promise<*>}
