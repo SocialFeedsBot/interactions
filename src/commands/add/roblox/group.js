@@ -8,7 +8,6 @@ module.exports = class extends Command {
     super(...args, {
       name: 'group',
       type: ApplicationCommandOptionType.SubCommand,
-      isDeveloper: true,
       description: 'Get latest shouts from a ROBLOX group.',
       options: [{
         name: 'groupid',

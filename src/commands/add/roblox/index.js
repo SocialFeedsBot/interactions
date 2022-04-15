@@ -6,8 +6,7 @@ module.exports = class extends Command {
     super(...args, {
       name: 'roblox',
       description: 'Add a new ROBLOX feed to a channel.',
-      options: [],
-      isDeveloper: true
+      options: []
     });
   }
 
