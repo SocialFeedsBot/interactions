@@ -67,6 +67,11 @@ module.exports = {
     Role: 8
   },
 
+  ApplicationCommandPermissionType: {
+    Role: 1,
+    User: 2
+  },
+
   ChannelType: {
     Text: 0,
     DM:	1,

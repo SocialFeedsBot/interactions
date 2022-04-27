@@ -23,6 +23,7 @@ module.exports = class extends Command {
         ':white_small_square: Twitter',
         ':white_small_square: Twitch',
         ':white_small_square: YouTube',
+        ':white_small_square: :new: Roblox Group Shouts',
         ':white_small_square: Status pages ([example](https://discordstatus.com))',
         '', 'Get started by typing `/add` and following on with the type of feed you would like to add!'
       ].join('\n'))

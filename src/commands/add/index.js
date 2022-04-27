@@ -6,7 +6,9 @@ module.exports = class extends Command {
     super(...args, {
       name: 'add',
       description: 'Add a new feed to a channel.',
-      options: []
+      options: [],
+      defaultMemberPermission: ['manageWebhooks'],
+      dmPermission: false
     });
   }
 

@@ -37,13 +37,6 @@ module.exports = class extends Command {
   }
 
   async run ({ id, token, member, guildID, args }) {
-    if (!member.permissions.has('manageWebhooks')) {
-      return new Command.InteractionResponse()
-        .setContent('You need the **Manage Webhooks** permission to run this command!')
-        .setEmoji('xmark')
-        .setEphemeral();
-    }
-
     await this.core.rest.api.interactions(id, token).callback.post(new Command.InteractionResponse()
       .ack());
     args.subreddit.value = verifyFeed('reddit', args.subreddit.value);

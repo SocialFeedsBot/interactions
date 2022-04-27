@@ -29,5 +29,11 @@ module.exports = {
   manageNicknames: BigInt(1) << BigInt(27),
   manageRoles: BigInt(1) << BigInt(28),
   manageWebhooks: BigInt(1) << BigInt(29),
-  manageEmojis: BigInt(1) << BigInt(30)
+  manageEmojis: BigInt(1) << BigInt(30),
+  useSlashCommands: BigInt(1) << (31),
+  voiceRequestToSpeak: BigInt(1) << (32),
+
+  manageThreads: BigInt(1) << (34),
+  usePublicThreads: BigInt(1) << (35),
+  usePrivateThreads: BigInt(1) << (36)
 };

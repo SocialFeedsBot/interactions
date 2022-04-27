@@ -1,4 +1,5 @@
 const { ApplicationCommandType } = require('../constants/Types');
+const Permissions = require('../constants/Permissions');
 
 class Command {
 
@@ -10,6 +11,16 @@ class Command {
     this.description = options.description;
     this.options = options.options || [];
     this.choices = options.choices || [];
+
+    this.dm_permission = options.dmPermission || true;
+    let defaultPermission = 0;
+    (options.defaultMemberPermission || []).forEach(permission => {
+      if (Permissions[permission]) {
+        defaultPermission |= Permissions[permission];
+      }
+    });
+
+    this.default_member_permission = defaultPermission;
 
     this.awaitingButtons = new Map();
     this.awaitingSelects = new Map();
@@ -52,6 +63,8 @@ class Command {
       name: this.name,
       type: this.type,
       description: this.description,
+      default_member_permission: this.default_member_permission,
+      dm_permission: this.dm_permission,
       options: this.options,
       choices: this.choices,
       isDeveloper: this.isDeveloper
@@ -80,4 +93,4 @@ module.exports.InteractionComponentResponse = require('../structures/Interaction
 /**
  * @type {InteractionModal}
  */
- module.exports.InteractionModal = require('../structures/InteractionModal');
+module.exports.InteractionModal = require('../structures/InteractionModal');

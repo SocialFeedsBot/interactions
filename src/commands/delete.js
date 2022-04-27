@@ -13,18 +13,13 @@ module.exports = class extends Command {
         description: 'Channel to remove the feed from.',
         required: true,
         channel_types: [ChannelType.Text, ChannelType.News]
-      }]
+      }],
+      dmPermission: false,
+      defaultMemberPermission: ['manageWebhooks']
     });
   }
 
   async run ({ id, token, guildID, member, user, args }) {
-    if (!member || !member.permissions.has('manageWebhooks')) {
-      return new Command.InteractionResponse()
-        .setContent('You need the **Manage Webhooks** permission to run this command!')
-        .setEmoji('xmark')
-        .setEphemeral();
-    }
-
     await this.core.rest.api.interactions(id, token).callback.post(new Command.InteractionResponse()
       .ack());
     let { body: { feeds } } = await this.core.api.getGuildFeeds(guildID);
