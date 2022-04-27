@@ -13,12 +13,16 @@ class Command {
     this.choices = options.choices || [];
 
     this.dm_permission = options.dmPermission || true;
-    let defaultPermission = 0;
+    let defaultPermission = BigInt(0);
     (options.defaultMemberPermission || []).forEach(permission => {
       if (Permissions[permission]) {
         defaultPermission |= Permissions[permission];
       }
     });
+
+    if (defaultPermission === BigInt(0)) {
+      defaultPermission = null;
+    }
 
     this.default_member_permission = defaultPermission;
 
@@ -63,7 +67,7 @@ class Command {
       name: this.name,
       type: this.type,
       description: this.description,
-      default_member_permission: this.default_member_permission,
+      default_member_permissions: this.default_member_permission?.toString(),
       dm_permission: this.dm_permission,
       options: this.options,
       choices: this.choices,

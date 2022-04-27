@@ -125,7 +125,6 @@ module.exports = class Dispatch {
     const options = this.findNonSubCommandOption(data.data.options);
 
     const result = await applicationCommand.handleAutocomplete(options, data);
-    console.log(result)
     return { type: InteractionResponseType.ApplicationCommandAutocompleteResult, data: { choices: result } };
   }
 
