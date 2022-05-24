@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/SocialFeedsBot/interactions/internal/health"
 	"github.com/sirupsen/logrus"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
@@ -188,6 +189,8 @@ func (s *Session) deploy(packet Packet) {
 			switch packet.Type {
 			case ActionRequestRestart:
 				s.reconnect()
+			case ActionRequestStats:
+				go s.SendStats(packet)
 			}
 		}
 	default:
@@ -286,4 +289,34 @@ func (s *Session) Connect() error {
 
 	go s.listen()
 	return nil
+}
+
+func (s *Session) SendStats(packet Packet) {
+	logrus.Traceln("Sending stats to websocket")
+	stats := health.Health{}
+	stats.ID = s.ID
+
+	// Get Uptime
+	stats.Uptime = health.GetUptime()
+
+	// Get memory usage
+	mem, err := health.GetMemory()
+	if err != nil {
+		logrus.Errorln(err)
+	}
+
+	stats.Memory = mem
+
+	response, err := json.Marshal(stats)
+	if err != nil {
+		logrus.Errorln(err)
+		return
+	}
+
+	s.send(Packet{
+		OPCode: OPCodeAction,
+		Type:   ActionResolve,
+		Data:   response,
+		ID:     packet.ID,
+	})
 }

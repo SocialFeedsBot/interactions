@@ -15,8 +15,7 @@ var StartTime = time.Now()
 type Health struct {
 	Uptime time.Duration `json:"uptime"` // Milliseconds
 	Memory uint64        `json:"memory"` // This won't work on my laptop :D
-	ID     string        `json:"id"`
-	Guilds int           `json:"guilds"`
+	ID     float64       `json:"id"`
 }
 
 func ByteCountSI(b uint64) string {
