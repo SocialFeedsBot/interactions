@@ -29,11 +29,12 @@ module.exports = class extends Command {
 
     const { body: counts } = await this.core.api.getCounts();
 
+    let stats;
     if (this.core.gatewayClient.connected) {
       let mem = await this.core.gatewayClient.action('stats', { name: 'interactions' });
       ram = mem.reduce((acc, val) => acc + val.memory, 0);
 
-      let stats = await this.core.gatewayClient.action('stats', { name: 'shards' });
+      stats = await this.core.gatewayClient.action('stats', { name: 'shards' });
       serverCount = stats.reduce((a, b) => a + b.guilds, 0);
     }
 
@@ -54,7 +55,7 @@ module.exports = class extends Command {
       .addField('\u200b', '\u200b', true)
       .addField('Uptime', moment.duration(process.uptime() * 1000).format('D[ days], H[ hours], m[ minutes], s[ seconds]'), true)
       .addField('Memory Usage', this.convertMem(ram), true)
-      .addField('Servers', serverCount.toLocaleString(), true);
+      .addField('Servers', `${serverCount.toLocaleString()}\n${stats.length} shards`, true);
   }
 
   convertMem (bytes) {
