@@ -55,7 +55,7 @@ module.exports = class extends Command {
       .addField('\u200b', '\u200b', true)
       .addField('Uptime', moment.duration(process.uptime() * 1000).format('D[ days], H[ hours], m[ minutes], s[ seconds]'), true)
       .addField('Memory Usage', this.convertMem(ram), true)
-      .addField('Servers', `${serverCount.toLocaleString()}\n${stats.length} shards`, true);
+      .addField('Servers', `${serverCount.toLocaleString()} (${stats.map(a => a.shards).flat().filter(a => a).length} shards)`, true);
   }
 
   convertMem (bytes) {
