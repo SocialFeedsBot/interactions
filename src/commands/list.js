@@ -108,7 +108,7 @@ module.exports = class extends Command {
 
     // Populate fields
     chunks[page - 1].forEach((doc) => {
-      description += `\n${this.feedType(doc)} ${doc.type === 'twitter' ? `[${doc.options.replies ? 'with replies' : 'without replies'}]` : ''}`;
+      description += `\n${this.feedType(doc)} ${doc.type === 'twitter' ? (doc.options.replies ? '`with replies`' : '`without replies`') : ''}`;
     });
 
     embed.setDescription(`You can now manage your feeds on an online [dashboard](https://socialfeeds.app)\n${description}`);
