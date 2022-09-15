@@ -82,7 +82,7 @@ module.exports = class extends Command {
       rss: `<:rss:644633161933914122> [${feed.url}](${feed.url})`,
       reddit: `<:reddit:648124175378284544> [${feed.url}](https://reddit.com/r/${feed.url})`,
       statuspage: `<:statuspage:809109311271600138> [Status Page: ${feed.url}](${feed.url})`,
-      'roblox-group': `<:roblox:977963193836142602> [Roblox Group: ${feed.display.title}](https://roblox.com/groups/${feed.url})`
+      'roblox-group': `<:roblox:977963193836142602> [Roblox Group: ${feed.display ? feed.display.title : feed.url}](https://roblox.com/groups/${feed.url})`
     }[feed.type];
   }
 
