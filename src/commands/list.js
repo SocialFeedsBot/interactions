@@ -20,8 +20,8 @@ module.exports = class extends Command {
   async run ({ guildID, args: { channel }, user, member, token }) {
     let { success, docs: allDocs } = await this.getFeeds(guildID);
     if (!success) {
-      return new Command.InteractionResponse()
-        .setContent('I need permissions to **Manage Webhooks** in order to view your feed list.')
+      return new Command.InteractionEmbedResponse()
+        .setDescription('SocialFeeds requires the permission **Manage Webhooks** to view feeds you have created and to create feeds.')
         .setEmoji('xmark');
     }
 

@@ -18,7 +18,7 @@ module.exports = class RESTHandler {
     const baseURL = options.apiURL || API_URL;
     const version = options.apiVersion || API_VERSION;
 
-    this.logger = logger.extension('Rest');
+    this.logger = logger;
     this.baseURL = `${baseURL}/v${version}`;
     this.ratelimits = {};
 
@@ -62,7 +62,7 @@ module.exports = class RESTHandler {
           params: query
         };
 
-        this.logger.debug(`${method.toUpperCase()} ${endpoint}`);
+        this.logger.debug(`${method.toUpperCase()} ${endpoint}`, { src: 'requestHandler' });
 
         axios.request(options)
           .then(res => {
@@ -74,7 +74,7 @@ module.exports = class RESTHandler {
 
             //  Reject with an APIError or HTTPError
             const rejectWithError = () => {
-              this.logger.error(`Request to ${endpoint} failed: ${new DiscordAPIError(res)}`);
+              this.logger.error(`Request failed! ${new DiscordAPIError(res)}`, { src: 'requestHandler/rejectWithError', endpoint });
               if (res.data && res.data.errors) {
                 reject(new DiscordAPIError(res));
               } else {

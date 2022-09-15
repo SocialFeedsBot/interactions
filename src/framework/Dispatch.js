@@ -20,7 +20,7 @@ const CommandStore = require('./CommandStore');
 module.exports = class Dispatch {
 
   constructor (core, logger) {
-    this.logger = logger.extension('Dispatch');
+    this.logger = logger;
     this.core = core;
     this.commandStore = new CommandStore(core);
   }
@@ -55,7 +55,7 @@ module.exports = class Dispatch {
           .catch(this.handleError.bind(this));
 
       default:
-        this.logger.warn(`Unknown interaction type "${data.type}" received`);
+        this.logger.warn(`Unknown interaction type "${data.type}" received`, { src: 'dispatch/handleInteraction' });
         return {};
     }
   }
@@ -156,7 +156,7 @@ module.exports = class Dispatch {
    * @returns {InteractionResponse}
    */
   handleError (error) {
-    this.logger.error(error.stack);
+    this.logger.error(error.stack, { src: 'dispatch/handleError' });
     return new InteractionResponse()
       .setContent('An unexpected error occurred executing this interaction.')
       .setEmoji('xmark')

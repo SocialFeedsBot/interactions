@@ -3,7 +3,6 @@ const config = require('../config');
 
 const app = require('express')();
 const cors = require('cors');
-const morgan = require('morgan');
 const nacl = require('tweetnacl');
 const bodyParser = require('body-parser');
 const Redis = require('ioredis');
@@ -34,7 +33,7 @@ module.exports = class Interactions {
   }
 
   async start () {
-    this.logger.info(`Assigned interactions id ${this.id}, starting...`);
+    this.logger.info(`Assigned interactions id ${this.id}, starting!`, { src: 'core' });
 
     // Get current user
     this.user = await this.rest.api.users(config.applicationID).get();
@@ -43,10 +42,10 @@ module.exports = class Interactions {
     this.app.listen(config.port);
     this.app.use(bodyParser.json());
     this.app.use(cors());
-    this.app.use(morgan(':date[web] [Request/DEBUG] :method :url :status - :response-time ms'));
+
     this.registerRoutes();
 
-    this.logger.ok(`Server listening on port: ${config.port}`);
+    this.logger.info(`Server listening on port: ${config.port}`, { src: 'core' });
     this.gatewayClient.sendReady();
   }
 

@@ -26,11 +26,11 @@ module.exports = class API {
   }
 
   createNewFeed (guildID, data) {
-    return this.api.feeds.post({ guildID, ...data });
+    return this.api.feeds(guildID).post(data);
   }
 
   deleteFeed (guildID, data) {
-    return this.api.feeds.delete({ ...data, guildID });
+    return this.api.feeds(guildID).delete(data);
   }
 
   setStatus (body) {

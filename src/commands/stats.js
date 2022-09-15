@@ -21,9 +21,10 @@ module.exports = class extends Command {
     const { body: thisServer, success } = guildID ? await this.core.api.getGuildFeeds(guildID) : { success: false, body: null };
 
     if (!success) {
-      return new Command.InteractionResponse()
-        .setContent('An unexpected error occurred gathering statistics, please try again later.')
+      return new Command.InteractionEmbedResponse()
+        .setDescription('An error occurred gathering statistics, please try again later.')
         .setEmoji('xmark')
+        .setColour('red')
         .setEphemeral();
     }
 
