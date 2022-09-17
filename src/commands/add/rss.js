@@ -49,7 +49,7 @@ module.exports = class extends Command {
       return this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(
         new Command.InteractionEmbedResponse()
           .setContent('Something went wrong when creating this feed, please report the error if it continues.')
-          .setDescription(message)
+          .setDescription(`Error: \`${message}\``)
           .setColour('red').toJSON().data
       );
     }
