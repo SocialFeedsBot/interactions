@@ -29,7 +29,7 @@ module.exports = class extends Command {
       return await this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(
         new Command.InteractionEmbedResponse()
           .setColour('red')
-          .setDescription(':x: You do not have any feeds in this channel to delete.')
+          .setDescription(':x: You do not have any feeds in this channel to delete.').toJSON().data
       );
     }
 
