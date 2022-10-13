@@ -27,9 +27,9 @@ module.exports = class extends Command {
 
     let docs = allDocs.filter(doc => doc.channelID === channel.value);
     if (!docs.length) {
-      return new Command.InteractionResponse()
-        .setContent('There are no feeds setup in this channel.')
-        .setEmoji('xmark');
+      return new Command.InteractionEmbedResponse()
+        .setDescription(':x: There are no feeds setup in this channel.')
+        .setColour('red');
     } else {
       let chunks = [];
       while (docs.length > 0) chunks.push(docs.splice(0, 5));
@@ -102,16 +102,16 @@ module.exports = class extends Command {
   generatePage (page, channel, allDocs, chunks) {
     let description = '';
     const embed = new Command.InteractionEmbedResponse()
-      .setTitle(`Feed list for #${channel}`)
+      .setTitle(`Your feeds in #${channel}`)
       .setColour(16753451)
-      .setFooter(`Total feeds: ${allDocs.length} (Page ${page}/${chunks.length})`);
+      .setFooter(`Total: ${allDocs.length} | Page: ${page}/${chunks.length}`);
 
     // Populate fields
     chunks[page - 1].forEach((doc) => {
       description += `\n${this.feedType(doc)} ${doc.type === 'twitter' ? (doc.options.replies ? '`with replies`' : '`without replies`') : ''}`;
     });
 
-    embed.setDescription(`You can now manage your feeds on an online [dashboard](https://socialfeeds.app)\n${description}`);
+    embed.setDescription(`You can manage these feeds easier with our online [dashboard](https://socialfeeds.app)\n${description}`);
     return embed;
   }
 

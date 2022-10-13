@@ -25,6 +25,14 @@ module.exports = class extends Command {
     let { body: { feeds } } = await this.core.api.getGuildFeeds(guildID);
     feeds = feeds.filter(f => f.channelID === args.channel.value);
 
+    if (!feeds.length) {
+      return await this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(
+        new Command.InteractionEmbedResponse()
+          .setColour('red')
+          .setDescription(':x: You do not have any feeds in this channel to delete.')
+      );
+    }
+
     await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}`, JSON.stringify({
       command: 'delete',
       feeds,
@@ -45,7 +53,7 @@ module.exports = class extends Command {
     while (feeds.length > 0) chunks.push(feeds.splice(0, 25));
 
     const resp = new Command.InteractionResponse()
-      .setContent('Select the feeds you want to remove');
+      .setContent('Use the select menu below to select feeds to remove.');
 
     chunks.forEach((chunk, i) => {
       resp.addSelectMenu({
@@ -91,14 +99,12 @@ module.exports = class extends Command {
 
     return await Promise.all(promises).then(res => new Command.InteractionEmbedResponse()
       .updateMessage()
-      .setContent('The following feeds were removed successfully')
       .setColour('green')
-      .setDescription(`- ${res.map(r => r.body.url).join('\n- ')}`)
+      .setDescription(`Successfully removed ${res.length} feeds from this channel!`)
     ).catch(err => new Command.InteractionEmbedResponse()
       .updateMessage()
-      .setContent('Some feeds could not be removed, try again later')
       .setColour('red')
-      .setDescription(err.message)
+      .setDescription(`:x: Some feeds could not be removed.\nError: \`${err.message}\``)
     );
   }
 
