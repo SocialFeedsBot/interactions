@@ -32,14 +32,6 @@ module.exports = class extends Command {
           .setDescription(':x: You do not have any feeds in this channel to delete.').toJSON().data
       );
     }
-
-    await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}`, JSON.stringify({
-      command: 'delete',
-      feeds,
-      token,
-      removeOnResponse: true,
-      userID: user.id
-    }));
     await this.core.redis.set(`interactions:awaits:cancel-deleteselect-${user.id}`, JSON.stringify({
       command: 'delete',
       feeds,
@@ -55,10 +47,18 @@ module.exports = class extends Command {
     const resp = new Command.InteractionResponse()
       .setContent('Use the select menu below to select feeds to remove.');
 
-    chunks.forEach((chunk, i) => {
+    chunks.forEach(async (chunk, i) => {
+      await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}-${i}`, JSON.stringify({
+        command: 'delete',
+        feeds,
+        token,
+        removeOnResponse: true,
+        userID: user.id
+      }));
+
       resp.addActionRow();
       resp.addSelectMenu({
-        custom_id: `deleteselect-${user.id}`,
+        custom_id: `deleteselect-${user.id}-${i}`,
         placeholder: `Click to see feeds (page ${i + 1})`,
         options: chunk,
         max_values: chunk.length
