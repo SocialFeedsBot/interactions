@@ -56,6 +56,7 @@ module.exports = class extends Command {
       .setContent('Use the select menu below to select feeds to remove.');
 
     chunks.forEach((chunk, i) => {
+      resp.addActionRow();
       resp.addSelectMenu({
         custom_id: `deleteselect-${user.id}`,
         placeholder: `Click to see feeds (page ${i + 1})`,
