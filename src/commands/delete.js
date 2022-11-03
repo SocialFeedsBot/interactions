@@ -47,23 +47,26 @@ module.exports = class extends Command {
     const resp = new Command.InteractionResponse()
       .setContent('Use the select menu below to select feeds to remove.');
 
-    for (let i = 0; i < chunks.length; i++) {
-      await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}-${i}`, JSON.stringify({
+    let promises = [];
+    chunks.forEach((chunk, i) => {
+      promises.push(this.core.redis.set(`interactions:awaits:deleteselect-${user.id}-${i}`, JSON.stringify({
         command: 'delete',
-        feeds: chunks[i],
+        feeds: chunk,
         token,
         removeOnResponse: true,
         userID: user.id
-      }));
+      })));
 
       resp.addActionRow();
       resp.addSelectMenu({
         custom_id: `deleteselect-${user.id}-${i}`,
         placeholder: `Click to see feeds (page ${i + 1})`,
-        options: chunks[i],
-        max_values: chunks[i].length
+        options: chunk,
+        max_values: chunk.length
       });
-    }
+    });
+
+    await Promise.all(promises);
 
     resp.addActionRow();
     resp.addButton({
