@@ -42,7 +42,7 @@ module.exports = class extends Command {
 
     feeds = feeds.map(f => this.display(f));
     let chunks = [];
-    while (feeds.length > 0) chunks.push(feeds.splice(0, 25));
+    while (feeds.length > 0) chunks.push(feeds.splice(0, 20));
 
     const resp = new Command.InteractionResponse()
       .setContent('Use the select menu below to select feeds to remove.');
@@ -50,7 +50,7 @@ module.exports = class extends Command {
     chunks.forEach(async (chunk, i) => {
       await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}-${i}`, JSON.stringify({
         command: 'delete',
-        feeds,
+        feeds: chunk,
         token,
         removeOnResponse: true,
         userID: user.id
@@ -116,7 +116,8 @@ module.exports = class extends Command {
       twitter: { nmae: 'twitter', id: '644633161212624946' },
       rss: { name: 'rss', id: '644633161933914122' },
       reddit: { name: 'reddit', id: '648124175378284544' },
-      statuspage: { name: 'statuspage', id: '809109311271600138' }
+      statuspage: { name: 'statuspage', id: '809109311271600138' },
+      roblox: { name: 'roblox', id: '977963193836142602' }
     };
     return {
       label: feed.display && feed.display.title ? feed.display.title.substring(0, 25) : feed.url.substring(0, 25),
