@@ -47,10 +47,10 @@ module.exports = class extends Command {
     const resp = new Command.InteractionResponse()
       .setContent('Use the select menu below to select feeds to remove.');
 
-    chunks.forEach(async (chunk, i) => {
+    for (let i = 0; i < chunks.length; i++) {
       await this.core.redis.set(`interactions:awaits:deleteselect-${user.id}-${i}`, JSON.stringify({
         command: 'delete',
-        feeds: chunk,
+        feeds: chunks[i],
         token,
         removeOnResponse: true,
         userID: user.id
@@ -60,10 +60,10 @@ module.exports = class extends Command {
       resp.addSelectMenu({
         custom_id: `deleteselect-${user.id}-${i}`,
         placeholder: `Click to see feeds (page ${i + 1})`,
-        options: chunk,
-        max_values: chunk.length
+        options: chunks[i],
+        max_values: chunks[i].length
       });
-    });
+    }
 
     resp.addActionRow();
     resp.addButton({
@@ -91,6 +91,7 @@ module.exports = class extends Command {
     let promises = [];
     toRemove.forEach(value => {
       const feed = data.feeds.find(f => f.url === value);
+      if (!feed) return;
       promises.push(this.core.api.deleteFeed(interaction.guildID, {
         type: feed.type,
         url: value,
