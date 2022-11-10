@@ -93,7 +93,7 @@ module.exports = class extends Command {
 
     let promises = [];
     toRemove.forEach(value => {
-      const feed = data.feeds.find(f => f.url === value);
+      const feed = data.feeds.find(f => f.value === value);
       if (!feed) return;
       promises.push(this.core.api.deleteFeed(interaction.guildID, {
         type: feed.type,
