@@ -6,11 +6,18 @@ const cors = require('cors');
 const nacl = require('tweetnacl');
 const bodyParser = require('body-parser');
 const Redis = require('ioredis');
+const sentry = require('@sentry/node');
 
 const Dispatch = require('./framework/Dispatch');
 const Prometheus = require('./framework/Prometheus');
 const RequestHandler = require('./rest/RequestHandler');
 const APIHandler = require('./api/API');
+
+if (config.sentry) {
+  sentry.init({
+    dsn: config.sentry
+  });
+}
 
 module.exports = class Interactions {
 

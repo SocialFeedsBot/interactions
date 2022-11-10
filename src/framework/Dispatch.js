@@ -15,6 +15,7 @@ const {
   InteractionSelect,
   InteractionAutocomplete
 } = require('../structures');
+const { captureException } = require('@sentry/node');
 const CommandStore = require('./CommandStore');
 
 module.exports = class Dispatch {
@@ -156,6 +157,7 @@ module.exports = class Dispatch {
    * @returns {InteractionResponse}
    */
   handleError (error) {
+    captureException(error);
     this.logger.error(error.stack, { src: 'dispatch/handleError' });
     return new InteractionResponse()
       .setContent('An unexpected error occurred executing this interaction.')
