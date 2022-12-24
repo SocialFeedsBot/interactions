@@ -86,7 +86,8 @@ module.exports = class extends Command {
     if (interaction.componentType === ComponentType.Button) {
       return new Command.InteractionResponse()
         .updateMessage()
-        .setContent('Select menu cancelled');
+        .setEmoji('xmark')
+        .setContent('Cancelled');
     }
 
     const toRemove = interaction.values;

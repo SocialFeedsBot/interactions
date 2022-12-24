@@ -33,6 +33,10 @@ module.exports = class API {
     return this.api.feeds(guildID).delete(data);
   }
 
+  getStatus () {
+    return this.api.status.get();
+  }
+
   setStatus (body) {
     return this.api.status.messages.patch(body);
   }

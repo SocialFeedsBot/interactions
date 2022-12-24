@@ -26,7 +26,7 @@ const worker = new GatewayClient(config.gateway.use, 'interactions', config.gate
 worker
   .on('error', (err) => logger.error(err, { src: 'gateway' }))
   .on('connect', (ms) => logger.info(`Connected in ${ms}ms`, { src: 'gateway' }))
-  .once('ready', () => new Interactions(Number(process.env.NODE_APP_INSTANCE || 0), worker, logger));
+  .once('ready', ({ id }) => new Interactions(id, worker, logger));
 
 worker.getExtraStats = () => ({ interactionsID: Number(process.env.NODE_APP_INSTANCE || 0) });
 
