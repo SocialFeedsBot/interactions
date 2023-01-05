@@ -13,6 +13,10 @@ module.exports = class API {
     });
   }
 
+  getPremiumStatus (id) {
+    return this.api.premium(id).get();
+  }
+
   getAllFeeds (query = {}) {
     return this.api.feeds.get(undefined, query);
   }
