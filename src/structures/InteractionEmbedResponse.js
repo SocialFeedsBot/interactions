@@ -44,7 +44,7 @@ class InteractionEmbedResponse extends InteractionResponse {
       };
     } else {
       this.embed.author = {
-        name: author,
+        name: author.length > 256 ? `${author.substring(0, 100)}...` : author,
         icon_url: iconURL
       };
     }
