@@ -22,8 +22,14 @@ module.exports = class extends Command {
   async run ({ id, token, guildID, member, user, args }) {
     await this.core.rest.api.interactions(id, token).callback.post(new Command.InteractionResponse()
       .ack());
-    let { body: { feeds } } = await this.core.api.getGuildFeeds(guildID);
-    feeds = feeds.filter(f => f.channelID === args.channel.value);
+    let { success, error, body } = await this.core.api.getGuildFeeds(guildID);
+    if (!success) {
+      return await this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(
+        new Command.InteractionEmbedResponse()
+          .setColour('red')
+          .setDescription(`:x: An error occurred (${error})`).toJSON().data);
+    }
+    let feeds = body.feeds.filter(f => f.channelID === args.channel.value);
 
     if (!feeds.length) {
       return await this.core.rest.api.webhooks(this.core.config.applicationID, token).messages('@original').patch(

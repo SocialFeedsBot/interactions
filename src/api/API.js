@@ -17,6 +17,10 @@ module.exports = class API {
     return this.api.premium(id).get();
   }
 
+  setPremiumStatus (id) {
+    return this.api.premium(id).get();
+  }
+
   getAllFeeds (query = {}) {
     return this.api.feeds.get(undefined, query);
   }
