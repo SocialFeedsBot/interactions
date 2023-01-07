@@ -10,7 +10,7 @@ module.exports = class extends Command {
     });
   }
 
-  run ({ user }) {
+  run ({ user, member }) {
     /*
       statuspage: `<:statuspage:809109311271600138> [Status Page: ${feed.url}](${feed.url})`,
       'roblox-group': `<:roblox:977963193836142602>
@@ -18,7 +18,7 @@ module.exports = class extends Command {
     return new Command.InteractionEmbedResponse()
       .setTitle('SocialFeeds')
       .setDescription([
-        `Hello, **${user.username}**! I am a Discord bot to send feeds to your server!`,
+        `Hello, **${user ? user.username : member.user.username}**! I am a Discord bot to send feeds to your server!`,
         'To invite me to your server, type `/invite` or click the invite button.',
         'You can manage your feeds via the online dashboard with the button below.',
         '', 'Here are some of the feeds I can post to your server:',
