@@ -100,11 +100,11 @@ module.exports = class extends Command {
   }
 
   generatePage (page, channel, allDocs, chunks) {
-    let description = '';
+    let description = `Now introducing premium! Check out our different tiers [here](https://socialfeeds.app/premium)!`;
     const embed = new Command.InteractionEmbedResponse()
       .setTitle(`Your feeds in #${channel}`)
       .setColour(16753451)
-      .setFooter(`Total: ${allDocs.length} | Page: ${page}/${chunks.length}`);
+      .setFooter(`socialfeeds.app/premium | Total: ${allDocs.length} | Page: ${page}/${chunks.length}`);
 
     // Populate fields
     chunks[page - 1].forEach((doc) => {
