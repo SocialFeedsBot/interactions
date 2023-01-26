@@ -20,7 +20,7 @@
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
     "morgan": "^1.10.0",
-    "superagent": "^6.1.0",
+    "superagent": "^8.0.9",
     "tweetnacl": "^1.0.3",
     "winston": "^3.8.2",
     "ws": "^8.2.0"
