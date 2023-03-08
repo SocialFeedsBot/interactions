@@ -34,9 +34,9 @@ module.exports = class extends Command {
     });
   }
 
-  async run ({ id, token, member, guildID, args }) {
+  async run ({ id, token, guildID, args }) {
     await this.core.rest.api.interactions(id, token).callback.post(new Command.InteractionResponse()
-      .ack());
+      .setContent('Searching for feed...'));
     args.account = verifyFeed('youtube', args.account.value);
 
     const { success, message, body } = await this.core.api.createNewFeed(guildID, {
@@ -60,8 +60,7 @@ module.exports = class extends Command {
       new Command.InteractionEmbedResponse()
         .setColour('green')
         .setAuthor(body.feedData.title, body.feedData.icon)
-        .setDescription(`Successfully added feed in \`#${args.channel.channel.name}\`!`)
-        .setEmoji('check').toJSON().data
+        .setContent(`Added feed in \`#${args.channel.channel.name}\`!`).toJSON().data
     );
   }
 
