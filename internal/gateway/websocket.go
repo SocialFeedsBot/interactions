@@ -260,7 +260,6 @@ func (s *Session) Connect() error {
 	// Prevent Connect or other major session functions from
 	// being called while it is still running.
 	s.Lock()
-	defer s.Unlock()
 
 	// If the websock is already open, bail out here.
 	if s.wsConn != nil {
@@ -275,8 +274,11 @@ func (s *Session) Connect() error {
 	}
 	c, _, err := websocket.Dial(s.wsCtx, s.URL, nil)
 	if err != nil {
-		logrus.Error(err)
-		return err
+		logrus.Warn(err)
+		s.Unlock()
+		time.Sleep(1 * time.Second)
+		s.Connect()
+		return nil
 	}
 	s.wsConn = c
 
@@ -288,7 +290,26 @@ func (s *Session) Connect() error {
 	s.listening = make(chan bool)
 
 	go s.listen()
+	s.Unlock()
 	return nil
+}
+
+func (s *Session) Restart(name string, id string, requester string) {
+	data, _ := json.Marshal(RestartRequester{Name: requester, Panel: false})
+	s.send(Packet{
+		OPCode:      OPCodeAction,
+		Type:        ActionRequestRestart,
+		Data:        data,
+		Destination: Destination{Name: name, ID: id},
+	})
+}
+
+func (s *Session) Reshard() {
+	s.send(Packet{
+		OPCode:      OPCodeAction,
+		Type:        ActionRequestReshard,
+		Destination: Destination{Name: "shards"},
+	})
 }
 
 func (s *Session) SendStats(packet Packet) {

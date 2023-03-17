@@ -2,15 +2,32 @@ package commands
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/Karitham/corde"
-	"github.com/sirupsen/logrus"
+	"github.com/Postcord/objects"
+	"github.com/Postcord/router"
 )
 
-func inviteHandler(w corde.ResponseWriter, r *corde.InteractionRequest, mux *corde.Mux) {
-	// https://discord.com/api/oauth2/authorize?client_id=640989075452723200&permissions=536870912&scope=bot%20applications.commands
-	w.Respond(corde.NewResp().
+func RegisterInvite(r *router.CommandRouter) {
+	r.NewCommandBuilder("invite").
+		Description("Invite me to get feeds posted to your server!").
+		Handler(func(ctx *router.CommandRouterCtx) error {
+			ctx.SetContent("Hi! I'm **SocialFeeds**, I can provide your server with realtime updates from your favourite platforms!\nInterested? Press the button below to add me!").
+				AddComponentRow([]*objects.Component{
+					{
+						Type:  objects.ComponentTypeButton,
+						Style: objects.ButtonStyleLink,
+						Label: "Invite me",
+						URL:   fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=536870912&scope=%v", ctx.ApplicationID, "bot%20applications.commands"),
+					},
+				})
+
+			return nil
+		}).
+		MustBuild()
+}
+
+/*
+w.Respond(corde.NewResp().
 		Content("Hi! I'm **SocialFeeds**, I can provide your server with realtime updates from your favourite platforms!\nInterested? Press the button below to add me!").
 		ActionRow(
 			corde.Component{
@@ -20,17 +37,4 @@ func inviteHandler(w corde.ResponseWriter, r *corde.InteractionRequest, mux *cor
 				URL:   fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=536870912&scope=%v", mux.AppID, "bot%20applications.commands"),
 			},
 		),
-	)
-}
-
-func RegisterInvite(mux *corde.Mux) {
-	var command = corde.NewSlashCommand("invite", "Invite me to your server.")
-	mux.Command("invite", func(w corde.ResponseWriter, r *corde.InteractionRequest) {
-		inviteHandler(w, r, mux)
-	})
-
-	g := corde.GuildOpt(corde.SnowflakeFromString(os.Getenv("DEV_SERVER_ID")))
-	if err := mux.RegisterCommand(command, g); err != nil {
-		logrus.Errorf("Error registering: ", err)
-	}
-}
+*/

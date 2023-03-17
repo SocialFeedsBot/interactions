@@ -1,27 +1,19 @@
 package commands
 
 import (
-	"os"
 	"time"
 
-	"github.com/Karitham/corde"
-	"github.com/sirupsen/logrus"
+	"github.com/Postcord/router"
 )
 
-func pingHandler(w corde.ResponseWriter, r *corde.InteractionRequest, mux *corde.Mux) {
-	start := time.Now().UnixNano() / int64(time.Millisecond)
-	_, _ = mux.GetCommands()
-	w.Respond(corde.NewResp().Contentf("Average roundrip: **%vms**", ((time.Now().UnixNano() / int64(time.Millisecond)) - start)))
-}
-
-func RegisterPing(mux *corde.Mux) {
-	var command = corde.NewSlashCommand("ping", "Say hi!")
-	mux.Command("ping", func(w corde.ResponseWriter, r *corde.InteractionRequest) {
-		pingHandler(w, r, mux)
-	})
-
-	g := corde.GuildOpt(corde.SnowflakeFromString(os.Getenv("DEV_SERVER_ID")))
-	if err := mux.RegisterCommand(command, g); err != nil {
-		logrus.Errorf("Error registering: ", err)
-	}
+func RegisterPing(r *router.CommandRouter) {
+	r.NewCommandBuilder("ping").
+		Description("Say hi!").
+		Handler(func(ctx *router.CommandRouterCtx) error {
+			start := time.Now().UnixNano() / int64(time.Millisecond)
+			_, _ = ctx.RESTClient.GetUser(ctx.Context, ctx.Member.User.ID)
+			ctx.SetContentf("Pong! **%vms**", ((time.Now().UnixNano() / int64(time.Millisecond)) - start))
+			return nil
+		}).
+		MustBuild()
 }

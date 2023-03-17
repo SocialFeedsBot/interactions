@@ -30,6 +30,7 @@ const (
 	ActionResolve        Action = "resolveAction"
 	ActionRequestStats   Action = "stats"
 	ActionRequestRestart Action = "restart"
+	ActionRequestReshard Action = "reshard"
 )
 
 // OPCodeTypes is used to help associate each OPCode when converted to a string
@@ -59,8 +60,19 @@ type Packet struct {
 	Data   json.RawMessage `json:"data,omitempty"`
 
 	// May not be included due to the way the gateway is setup
-	Type Action `json:"type,omitempty"`
+	Type        Action      `json:"type,omitempty"`
+	Destination Destination `json:"destination,omitempty"`
+	ID          string      `json:"id,omitempty"`
+}
+
+type Destination struct {
+	Name string `json:"name"`
 	ID   string `json:"id,omitempty"`
+}
+
+type RestartRequester struct {
+	Name  string `json:"restarter"`
+	Panel bool   `json:"panel"`
 }
 
 // Identify is a helper structure used to send identify payloads where ID may or may not be present

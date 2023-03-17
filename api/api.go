@@ -78,6 +78,7 @@ type Feed struct {
 	Type           string      `json:"type"`
 	URL            string      `json:"url"`
 	GuildID        string      `json:"guildID"`
+	ChannelID      string      `json:"channelID,omitempty"`
 	Options        FeedOptions `json:"options,omitempty"`
 	Display        FeedDisplay `json:"display"`
 	FailedAttempts int         `json:"failedAttempts"`
@@ -90,6 +91,7 @@ type FeedOptions struct {
 	ExcludeDescription bool   `json:"excludeDesc"`
 	NoEmbed            bool   `json:"noEmbed"`
 	TwitchUserID       string `json:"user_id"`
+	Message            string `json:"message"`
 }
 
 type FeedDisplay struct {
@@ -108,15 +110,38 @@ type FeedCount struct {
 	RobloxGroup int64 `json:"rblxGroup"`
 }
 
+type CreateFeedData struct {
+	URL       string      `json:"url"`
+	Type      string      `json:"type"`
+	ChannelID string      `json:"channelID"`
+	GuildID   string      `json:"guildID"`
+	NSFW      bool        `json:"nsfw"`
+	Options   FeedOptions `json:"options,omitempty"`
+}
+
+type FeedCreateResult struct {
+	Success  bool        `json:"success"`
+	Error    string      `json:"error,omitempty"`
+	FeedData FeedDisplay `json:"feedData"`
+}
+
 type Status struct {
+	Sharders []SharderStatus `json:"shards"`
+}
+
+type SharderStatus struct {
+	Uptime int64         `json:"uptime"`
+	Memory int64         `json:"memory"`
+	ID     int64         `json:"id"`
+	Guilds int64         `json:"guilds"`
 	Shards []ShardStatus `json:"shards"`
 }
 
 type ShardStatus struct {
-	Uptime int64  `json:"uptime"`
-	Memory int64  `json:"memory"`
-	ID     string `json:"id"`
-	Guilds int64  `json:"guilds"`
+	Uptime int64 `json:"uptime"`
+	Memory int64 `json:"memory"`
+	ID     int64 `json:"id"`
+	Guilds int64 `json:"guilds"`
 }
 
 func (api *API) Request(protocol, path string, payload []byte, extraHeaders map[string]string) Response {
@@ -350,6 +375,32 @@ func (api *API) GetServerFeeds(id string) ([]Feed, int, error) {
 	return list, total, nil
 }
 
+func (api *API) CreateFeed(guildID string, raw CreateFeedData) (FeedCreateResult, error) {
+	raw.GuildID = guildID
+	data, err := json.Marshal(raw)
+	if err != nil {
+		logrus.Debugf("error with marshalling delete feed: %v", err)
+		return FeedCreateResult{}, err
+	}
+
+	response, err := api.Request(http.MethodPost, fmt.Sprintf("/feeds/%s", guildID), data, map[string]string{"Content-Type": "application/json"}).GetBody()
+	if err != nil {
+		logrus.Errorf("error with creating feed on API: %v", err)
+		return FeedCreateResult{}, err
+	}
+
+	var payload FeedCreateResult
+	err = json.Unmarshal(response, &payload)
+	if err != nil {
+		logrus.Debugf("error with creating feed: %v", err)
+		return FeedCreateResult{}, err
+	}
+
+	logrus.Debugln("Feed successfully created")
+
+	return payload, nil
+}
+
 func (api *API) DeleteFeed(feed Feed) (Feed, error) {
 	if feed.URL == "" {
 		logrus.Errorf("Feed URL is empty, cannot delete feed")
@@ -362,9 +413,9 @@ func (api *API) DeleteFeed(feed Feed) (Feed, error) {
 		return Feed{}, err
 	}
 
-	response, err := api.Request(http.MethodDelete, "/feeds", data, map[string]string{"Content-Type": "application/json"}).GetBody()
+	response, err := api.Request(http.MethodDelete, fmt.Sprintf("/feeds/%s", feed.GuildID), data, map[string]string{"Content-Type": "application/json"}).GetBody()
 	if err != nil {
-		logrus.Errorf("error with deleting feed on API: %v", err)
+		logrus.Errorf("error with deleting feed on API: %s %v", fmt.Sprintf("/feeds/%s", feed.GuildID), err)
 		return Feed{}, err
 	}
 
