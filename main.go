@@ -17,10 +17,20 @@ func main() {
 	logger.Format()
 
 	// Load config
-	e := env.Load()
-	if e != nil {
-		logrus.Error(e)
-		return
+	if os.Getenv("DEV") == "true" {
+		logrus.Debug("Running in development environment")
+		e := env.Load(".env.dev")
+		if e != nil {
+			logrus.Error(e)
+			return
+		}
+	} else {
+		logrus.Debug("Running in production environment")
+		e := env.Load()
+		if e != nil {
+			logrus.Error(e)
+			return
+		}
 	}
 
 	gateway := gateway.Gateway{
