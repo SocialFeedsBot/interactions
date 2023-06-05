@@ -88,6 +88,7 @@ type Feed struct {
 
 type FeedOptions struct {
 	FetchReplies       bool   `json:"replies"`
+	IncludeRetweets    bool   `json:"retweets"`
 	ExcludeDescription bool   `json:"excludeDesc"`
 	NoEmbed            bool   `json:"noEmbed"`
 	TwitchUserID       string `json:"user_id"`

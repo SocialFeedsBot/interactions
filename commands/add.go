@@ -161,6 +161,8 @@ func BuildTwitter(group *router.CommandGroup) {
 		ChannelOption("channel", "Channel to send live updates to.", true).
 		StringOption("message", "Custom message to send with new updates.", false, nil).
 		BoolOption("no-embed", "Show any updates as plain text.", false).
+		BoolOption("inclide-replies", "Include any replies to tweets from this account. Default to false.", false).
+		BoolOption("include-retweets", "Include retweets from this account. Default to true.", false).
 		Handler(func(c *router.CommandRouterCtx) error {
 			channel := c.Options["channel"].(router.Resolvable[objects.Channel]).Resolve()
 			feedOptions := api.FeedOptions{}
@@ -170,6 +172,12 @@ func BuildTwitter(group *router.CommandGroup) {
 			}
 			if c.Options["no-embed"] != nil {
 				feedOptions.NoEmbed = c.Options["no-embed"].(bool)
+			}
+			if c.Options["include-replies"] != nil {
+				feedOptions.FetchReplies = c.Options["include-replies"].(bool)
+			}
+			if c.Options["include-retweets"] != nil {
+				feedOptions.IncludeRetweets = c.Options["include-retweets"].(bool)
 			}
 
 			c.DeferredChannelMessageWithSource(func(ctx *router.CommandRouterCtx) error {
