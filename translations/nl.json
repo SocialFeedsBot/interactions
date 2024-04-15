@@ -1,0 +1,6 @@
+{
+    "pong": "Pong! `{{ms}}ms`!",
+    "stats": {
+        "error": "An error occurred gathering statistics, please try again later."
+    }
+}
